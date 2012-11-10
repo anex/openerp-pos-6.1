@@ -123,7 +123,6 @@ body.openerp {
     padding: 5px 9px;
     text-align: center;
     color: white;
-    border-left: 1px solid #373737;
 }
 
 .point-of-sale #loggedas p {
@@ -302,7 +301,7 @@ body.openerp {
 
 .point-of-sale #rightpane header {
     padding: 0;
-    height: 40px;
+    height: 33px;
     border-bottom: 1px solid #cecbcb;
     background: #d3d3d3;
     background: -moz-linear-gradient(white, #d3d3d3);
