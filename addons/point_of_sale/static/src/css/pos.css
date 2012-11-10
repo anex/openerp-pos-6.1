@@ -89,9 +89,6 @@ body.openerp {
 .point-of-sale #topheader button {
     color: black;
     border: 1px solid black;
-    background: #7f82ac;
-    background: -moz-linear-gradient(#b2b3d7, #7f82ac);
-    background: -webkit-gradient(linear, left top, left bottom, from(#b2b3d7), to(#7f82ac));
 }
 
 .point-of-sale #branding, .point-of-sale #rightheader {
@@ -163,7 +160,7 @@ body.openerp {
     width: 100%;
     position: absolute;
     top: 0;
-    bottom: 271px;
+    bottom: 320px;
     overflow: auto;
 }
 
