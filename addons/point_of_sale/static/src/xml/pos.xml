@@ -165,7 +165,7 @@
                 </t>
             </ol>
             <div class="searchbox">
-                <input placeholder="Search Products" />
+                <input placeholder="Buscar Producto" />
                 <img class="search-clear" src="/point_of_sale/static/src/img/search_reset.gif" />
             </div>
         </header>
