@@ -1,4 +1,8 @@
 
+body.openerp {
+    overflow: hidden;
+}
+
 .point-of-sale {
     padding: 0;
     margin: 0;
@@ -302,7 +306,7 @@
 
 .point-of-sale #rightpane header {
     padding: 0;
-    height: 32px;
+    height: 40px;
     border-bottom: 1px solid #cecbcb;
     background: #d3d3d3;
     background: -moz-linear-gradient(white, #d3d3d3);
