@@ -182,7 +182,7 @@ body.openerp {
     font-size: 11px;
     text-align: right;
     min-width: 40px;
-    white-space: normal;
+    white-space: nowrap;
 }
 
 .point-of-sale #current-order td:first-child {
@@ -190,6 +190,7 @@ body.openerp {
     padding: 6px;
     text-align: left;
     text-overflow: ellipsis;
+    white-space: normal;
 }
 
 .point-of-sale #current-order td:last-child {
