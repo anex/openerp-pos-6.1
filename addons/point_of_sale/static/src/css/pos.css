@@ -311,7 +311,7 @@ body.openerp {
 .point-of-sale .product-list {
     overflow: auto;
     position: absolute;
-    top: 72px;
+    top: 108px;
     bottom: 0;
 }
 
@@ -346,7 +346,6 @@ body.openerp {
 }
 
 .point-of-sale .searchbox {
-    position: absolute;
     right: 2px;
 }
 

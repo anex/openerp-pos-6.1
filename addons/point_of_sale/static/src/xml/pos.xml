@@ -164,11 +164,12 @@
                     </li>
                 </t>
             </ol>
-            <div class="searchbox">
-                <input placeholder="Buscar Producto" />
-                <img class="search-clear" src="/point_of_sale/static/src/img/search_reset.gif" />
-            </div>
+
         </header>
+        <div class="searchbox">
+            <input placeholder="Buscar Producto" />
+            <img class="search-clear" src="/point_of_sale/static/src/img/search_reset.gif" />
+        </div>
         <div id="categories">
             <ol>
                 <t t-foreach="categories" t-as="category">
