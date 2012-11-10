@@ -2,6 +2,38 @@ openerp.point_of_sale = function(db) {
     
     db.point_of_sale = {};
 
+    function ledDisplay(line1,line2){
+            try{
+                if (window.XMLHttpRequest)
+                  {// code for IE7+, Firefox, Chrome, Opera, Safari
+                  xmlhttp=new XMLHttpRequest();
+                  }
+                else
+                  {// code for IE6, IE5
+                  xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+                  }
+                  xmlhttp.open("GET","http://localhost:8100/"+String(line1)+"___"+String(line2),false);
+                  xmlhttp.send();
+                }catch(err){
+            }
+    }
+
+    function impresora_fiscal(line1,line2){  
+        try{  
+            if (window.XMLHttpRequest)  
+              {// code for IE7+, Firefox, Chrome, Opera, Safari  
+              xmlhttp=new XMLHttpRequest();  
+              }  
+            else  
+              {// code for IE6, IE5  
+              xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");  
+              }  
+              xmlhttp.open("GET","http://localhost:8200/"+String(line1)+"___"+String(line2),false);  
+              xmlhttp.send();  
+            }catch(err){  
+        }  
+    }  
+
     var QWeb = db.web.qweb;
     var qweb_template = function(template) {
         return function(ctx) {
@@ -353,6 +385,8 @@ openerp.point_of_sale = function(db) {
         },
         initialize: function(attributes){
             Backbone.Model.prototype.initialize.apply(this, arguments);
+
+            impresora_fiscal('ABRIR1',"ABRIR1");
             this.set({
                 creationDate:   new Date,
                 orderLines:     new OrderlineCollection,
@@ -376,6 +410,12 @@ openerp.point_of_sale = function(db) {
         addProduct: function(product) {
             var existing;
             existing = (this.get('orderLines')).get(product.id);
+            //alert(JSON.stringify(product))
+            //alert('PRODUCTO___'+product.get("name")+"___"+product.get("list_price")+"___1")
+
+	    ledDisplay(product.get('name'),product.get('list_price')+" "+pos.get('currency').symbol);
+            impresora_fiscal('PRODUCTO',product.get("name")+"___"+product.get("list_price")*100+"___1") //falta sacar "taxes_id":[0] del diccionario
+
             if (existing != null) {
                 existing.incrementQuantity();
             } else {
@@ -456,6 +496,9 @@ openerp.point_of_sale = function(db) {
                 orders: new OrderCollection(),
                 products: new ProductCollection()
             });
+
+            impresora_fiscal("RESET","hola");
+            //impresora_fiscal('ABRIR1',"ABRIR1");
             this.set({
                 cashRegisters: new CashRegisterCollection(pos.store.get('account.bank.statement')),
             });
@@ -598,6 +641,12 @@ openerp.point_of_sale = function(db) {
         performPayment: function(event) {
             if (this.shop.get('selectedOrder').get('step') === 'receipt')
                 return;
+
+            impresora_fiscal("SUBTOTAL","SUBTOTAL");
+	    currentOrder = this.shop.get('selectedOrder');
+	    dueTotal = currentOrder.getTotal();
+	    ledDisplay("Total:",dueTotal.toFixed(2)+" "+pos.get('currency').symbol);
+
             var cashRegister, cashRegisterCollection, cashRegisterId;
             /* set correct view */
             this.shop.get('selectedOrder').set({'step': 'payment'});
@@ -926,6 +975,9 @@ openerp.point_of_sale = function(db) {
         validateCurrentOrder: function() {
             var callback, currentOrder;
             currentOrder = this.shop.get('selectedOrder');
+	    paidTotal = currentOrder.getPaidTotal();
+            impresora_fiscal("PAGO","Pago Recibido___"+paidTotal*100)
+	    ledDisplay("Vuelto:",$("#payment-remaining").html());
             $('button#validate-order', this.$element).attr('disabled', 'disabled');
             pos.pushOrder(currentOrder.exportAsJSON()).then(_.bind(function() {
                 $('button#validate-order', this.$element).removeAttr('disabled');
@@ -1022,6 +1074,8 @@ openerp.point_of_sale = function(db) {
             window.print();
         },
         finishOrder: function() {
+            impresora_fiscal("GAVETA","GAVETA")
+            impresora_fiscal("CERRAR1","CERRAR1")
             this.shop.get('selectedOrder').destroy();
         },
         changeSelectedOrder: function() {
@@ -1130,6 +1184,8 @@ openerp.point_of_sale = function(db) {
         createNewOrder: function() {
             var newOrder;
             newOrder = new Order;
+            impresora_fiscal('ABRIR1',"ABRIR1");
+	    ledDisplay("@chavezcandanga: ...","      PDVAL");
             (this.shop.get('orders')).add(newOrder);
             this.shop.set({
                 selectedOrder: newOrder
