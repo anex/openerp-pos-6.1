@@ -364,8 +364,8 @@ body.openerp {
 
 .point-of-sale .search-clear {
     position: absolute;
-    top: 11px;
-    right: 11px;
+    top: 40px;
+    right: 25px;
     cursor: pointer;
     display: none;
 }
