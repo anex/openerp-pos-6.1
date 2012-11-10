@@ -88,7 +88,6 @@ body.openerp {
 
 .point-of-sale #topheader button {
     color: black;
-    border: 1px solid black;
 }
 
 .point-of-sale #branding, .point-of-sale #rightheader {
@@ -359,7 +358,7 @@ body.openerp {
     border-radius: 11px;
     border: 1px solid #cecbcb;
     padding: 3px 19px;
-    margin: 6px;
+    margin: 3px;
     background: url("../img/search.png") no-repeat 5px;
     background-color: white;
     font-size: 140%;
