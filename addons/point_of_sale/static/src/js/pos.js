@@ -101,7 +101,7 @@ openerp.point_of_sale = function(db) {
                 }, this));
             }, this));
             $.when(this.fetch('pos.category', ['name', 'parent_id', 'child_id']),
-                this.fetch('product.product', ['name', 'list_price', 'pos_categ_id', 'taxes_id', 'product_image_small', 'ean13', 'id'], [['pos_categ_id', '!=', false]]),
+                this.fetch('product.product', ['name', 'list_price', 'pos_categ_id', 'taxes_id', 'product_image_small', 'ean13', 'code', 'id'], [['pos_categ_id', '!=', false]]),
                 this.fetch('product.packaging', ['product_id', 'ean']),
                 this.fetch('account.bank.statement', ['account_id', 'currency', 'journal_id', 'state', 'name'],
                     [['state', '=', 'open'], ['user_id', '=', this.session.uid]]),
@@ -1411,19 +1411,28 @@ openerp.point_of_sale = function(db) {
                 }
             });
 
-            $('.searchbox input').keyup(function() {
-                var m, s;
+            $('.searchbox input').keyup(function(event) {
+                var m, s, myproduct;
                 s = $(this).val().toLowerCase();
                 if (s) {
                     m = products.filter( function(p) {
-                        return p.name.toLowerCase().indexOf(s) != -1;
+                        return (String(p.code).toLowerCase().indexOf(s) != -1) || (String(p.ean13).toLowerCase().indexOf(s) != -1) || (p.name.toLowerCase().indexOf(s) != -1);
                     });
                     $('.search-clear').fadeIn();
                 } else {
                     m = products;
                     $('.search-clear').fadeOut();
                 }
-                return (self.shop.get('products')).reset(m);
+
+                if (m.length == 1 && event.keyCode == 13) {
+                    myproduct = self.shop.get('products').get(m[0]);
+                    self.shop.get('selectedOrder').addProduct(myproduct);
+                    $(this).val('');
+                    return (self.shop.get('products')).reset(products);
+                }else{
+                    return (self.shop.get('products')).reset(m);
+                }
+
             });
             return $('.search-clear').click( function() {
                 (self.shop.get('products')).reset(products);
