@@ -1411,6 +1411,11 @@ openerp.point_of_sale = function(db) {
                 }
             });
 
+            $('.searchbox input').blur(function() { $('.searchbox input').focus(); });
+            setInterval(function(){
+		$('.searchbox input').focus();
+		},1000);
+	   
             $('.searchbox input').keyup(function(event) {
                 var m, s, myproduct;
                 s = $(this).val().toLowerCase();
@@ -1428,7 +1433,9 @@ openerp.point_of_sale = function(db) {
                     myproduct = self.shop.get('products').get(m[0]);
                     self.shop.get('selectedOrder').addProduct(myproduct);
                     $(this).val('');
-                    return (self.shop.get('products')).reset(products);
+		    setTimeout(function(){
+				(self.shop.get('products')).reset(products);
+			}, 1000);
                 }else{
                     return (self.shop.get('products')).reset(m);
                 }
