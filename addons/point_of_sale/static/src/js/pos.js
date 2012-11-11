@@ -583,7 +583,7 @@ openerp.point_of_sale = function(db) {
             var bufferContent, params;
             bufferContent = this.get('buffer');
             if (bufferContent && !isNaN(bufferContent)) {
-            	this.trigger('setValue', parseFloat(bufferContent));
+		this.trigger('setValue', parseFloat(bufferContent));
             }
         },
     });
@@ -605,6 +605,7 @@ openerp.point_of_sale = function(db) {
             this.$element.find('button#numpad-minus').click(_.bind(this.clickSwitchSign, this));
             this.$element.find('button.number-char').click(_.bind(this.clickAppendNewChar, this));
             this.$element.find('button.mode-button').click(_.bind(this.clickChangeMode, this));
+            this.$element.find('button.auth-button').click(_.bind(this.clickAuthMode, this));
         },
         clickDeleteLastChar: function() {
             return this.state.deleteLastChar();
@@ -620,6 +621,10 @@ openerp.point_of_sale = function(db) {
         clickChangeMode: function(event) {
             var newMode = event.currentTarget.attributes['data-mode'].nodeValue;
             return this.state.changeMode(newMode);
+        },
+        clickAuthMode: function(event) {
+	    var newMode = event.currentTarget.attributes['data-mode'].nodeValue;
+	    return this.state.changeMode(newMode);
         },
         changedMode: function() {
             var mode = this.state.get('mode');
@@ -761,24 +766,46 @@ openerp.point_of_sale = function(db) {
             this.bindOrderLineEvents();
         },
         setNumpadState: function(numpadState) {
-        	if (this.numpadState) {
-        		this.numpadState.unbind('setValue', this.setValue);
-        	}
-        	this.numpadState = numpadState;
-        	if (this.numpadState) {
-        		this.numpadState.bind('setValue', this.setValue, this);
-        		this.numpadState.reset();
-        	}
+		if (this.numpadState) {
+			this.numpadState.unbind('setValue', this.setValue);
+		}
+		this.numpadState = numpadState;
+		if (this.numpadState) {
+			this.numpadState.bind('setValue', this.setValue, this);
+			this.numpadState.reset();
+		}
         },
         setValue: function(val) {
-        	var param = {};
-        	param[this.numpadState.get('mode')] = val;
-        	var order = this.shop.get('selectedOrder');
-        	if (order.get('orderLines').length !== 0) {
-        	   order.selected.set(param);
-        	} else {
-        	    this.shop.get('selectedOrder').destroy();
-        	}
+		var param = {};
+		param[this.numpadState.get('mode')] = val;
+		var order = this.shop.get('selectedOrder');
+		if (order.get('orderLines').length !== 0) {
+                   if (val > order.selected.get('quantity')){
+
+		   for (var i=0;i<(val-order.selected.get('quantity'));i++)
+		   { 
+		   	impresora_fiscal('PRODUCTO',order.selected.get("name")+"___"+order.selected.get("list_price")*100+"___1")
+		   }
+
+		   order.selected.set(param);
+		}else{
+		    var cod = prompt("Delice tarjeta de autorización","")
+		    if (cod == "%23463?"){
+                           var antes = order.selected.get('quantity')
+                           var ahora = val 
+		   	   order.selected.set(param);
+			   for (var i=0;i<(antes-ahora);i++)
+			   { 
+				impresora_fiscal('ANULACION',order.selected.get("name")+"___"+order.selected.get("list_price")*100+"___1")
+			   }
+
+
+		    }
+
+                }
+		} else {
+		    this.shop.get('selectedOrder').destroy();
+		}
         },
         changeSelectedOrder: function() {
             this.currentOrderLines.unbind();
@@ -801,13 +828,13 @@ openerp.point_of_sale = function(db) {
             this.updateSummary();
         },
         selectedLine: function() {
-        	var reset = false;
-        	if (this.currentSelected !== this.shop.get('selectedOrder').selected) {
-        		reset = true;
-        	}
-        	this.currentSelected = this.shop.get('selectedOrder').selected;
-        	if (reset && this.numpadState)
-        		this.numpadState.reset();
+		var reset = false;
+		if (this.currentSelected !== this.shop.get('selectedOrder').selected) {
+			reset = true;
+		}
+		this.currentSelected = this.shop.get('selectedOrder').selected;
+		if (reset && this.numpadState)
+			this.numpadState.reset();
             this.updateSummary();
         },
         render_element: function() {
@@ -817,7 +844,7 @@ openerp.point_of_sale = function(db) {
                         model: orderLine,
                         order: this.shop.get('selectedOrder')
                 });
-            	line.on_selected.add(_.bind(this.selectedLine, this));
+		line.on_selected.add(_.bind(this.selectedLine, this));
                 line.appendTo(this.$element);
             }, this));
             this.updateSummary();
@@ -932,18 +959,18 @@ openerp.point_of_sale = function(db) {
             var newAmount;
             newAmount = event.currentTarget.value;
             if (newAmount && !isNaN(newAmount)) {
-            	this.amount = parseFloat(newAmount);
+		this.amount = parseFloat(newAmount);
                 this.model.set({
                     amount: this.amount,
                 });
             }
         },
         changedAmount: function() {
-        	if (this.amount !== this.model.get('amount'))
-        		this.render_element();
+		if (this.amount !== this.model.get('amount'))
+			this.render_element();
         },
         render_element: function() {
-        	this.amount = this.model.get('amount');
+		this.amount = this.model.get('amount');
             this.$element.html(this.template_fct({
                 name: (this.model.get('journal_id'))[1],
                 amount: this.amount,
@@ -975,11 +1002,11 @@ openerp.point_of_sale = function(db) {
         validateCurrentOrder: function() {
             var callback, currentOrder;
             currentOrder = this.shop.get('selectedOrder');
-	          paidTotal = currentOrder.getPaidTotal();
-	          ledDisplay("Vuelto:",$("#payment-remaining").html());
+		  paidTotal = currentOrder.getPaidTotal();
+		  ledDisplay("Vuelto:",$("#payment-remaining").html());
+            impresora_fiscal("GAVETA","GAVETA")
             impresora_fiscal("PAGO","Pago Recibido___"+paidTotal*100)
             impresora_fiscal("CERRAR1","CERRAR1")
-            impresora_fiscal("GAVETA","GAVETA")
             $('button#validate-order', this.$element).attr('disabled', 'disabled');
             pos.pushOrder(currentOrder.exportAsJSON()).then(_.bind(function() {
                 $('button#validate-order', this.$element).removeAttr('disabled');
@@ -1020,7 +1047,7 @@ openerp.point_of_sale = function(db) {
             this.updatePaymentSummary();
         },
         deleteLine: function(lineWidget) {
-        	this.currentPaymentLines.remove([lineWidget.model]);
+		this.currentPaymentLines.remove([lineWidget.model]);
         },
         updatePaymentSummary: function() {
             var currentOrder, dueTotal, paidTotal, remaining, remainingAmount;
@@ -1034,23 +1061,23 @@ openerp.point_of_sale = function(db) {
             $('#payment-remaining').html(remaining);
         },
         setNumpadState: function(numpadState) {
-        	if (this.numpadState) {
-        		this.numpadState.unbind('setValue', this.setValue);
-        		this.numpadState.unbind('change:mode', this.setNumpadMode);
-        	}
-        	this.numpadState = numpadState;
-        	if (this.numpadState) {
-        		this.numpadState.bind('setValue', this.setValue, this);
-        		this.numpadState.bind('change:mode', this.setNumpadMode, this);
-        		this.numpadState.reset();
-        		this.setNumpadMode();
-        	}
+		if (this.numpadState) {
+			this.numpadState.unbind('setValue', this.setValue);
+			this.numpadState.unbind('change:mode', this.setNumpadMode);
+		}
+		this.numpadState = numpadState;
+		if (this.numpadState) {
+			this.numpadState.bind('setValue', this.setValue, this);
+			this.numpadState.bind('change:mode', this.setNumpadMode, this);
+			this.numpadState.reset();
+			this.setNumpadMode();
+		}
         },
-    	setNumpadMode: function() {
-    		this.numpadState.set({mode: 'payment'});
-    	},
+	setNumpadMode: function() {
+		this.numpadState.set({mode: 'payment'});
+	},
         setValue: function(val) {
-        	this.currentPaymentLines.last().set({amount: val});
+		this.currentPaymentLines.last().set({amount: val});
         },
     });
 
@@ -1201,22 +1228,22 @@ openerp.point_of_sale = function(db) {
             newOrderButton.selectOrder();
         },
         changedSelectedOrder: function() {
-        	if (this.currentOrder) {
-        		this.currentOrder.unbind('change:step', this.changedStep);
-        	}
-        	this.currentOrder = this.shop.get('selectedOrder');
-        	this.currentOrder.bind('change:step', this.changedStep, this);
-        	this.changedStep();
+		if (this.currentOrder) {
+			this.currentOrder.unbind('change:step', this.changedStep);
+		}
+		this.currentOrder = this.shop.get('selectedOrder');
+		this.currentOrder.bind('change:step', this.changedStep, this);
+		this.changedStep();
         },
         changedStep: function() {
-        	var step = this.currentOrder.get('step');
-        	this.orderView.setNumpadState(null);
-        	this.paymentView.setNumpadState(null);
-        	if (step === 'products') {
-        		this.orderView.setNumpadState(this.numpadView.state);
-        	} else if (step === 'payment') {
-        		this.paymentView.setNumpadState(this.numpadView.state);
-        	}
+		var step = this.currentOrder.get('step');
+		this.orderView.setNumpadState(null);
+		this.paymentView.setNumpadState(null);
+		if (step === 'products') {
+			this.orderView.setNumpadState(this.numpadView.state);
+		} else if (step === 'payment') {
+			this.paymentView.setNumpadState(this.numpadView.state);
+		}
         },
     });
 
