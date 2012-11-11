@@ -120,9 +120,6 @@
                             </table>
                         </div>
                         <div class="pos-payment-buttons">
-                            <button class="oe-back-to-products">
-                                <img src="/web/static/src/img/icons/gtk-go-back.png"></img>
-                                Back to Products</button>
                             <button id="validate-order">
                                 <img src="/web/static/src/img/icons/gtk-apply.png"></img>
                                 Validate</button>

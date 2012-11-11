@@ -975,9 +975,11 @@ openerp.point_of_sale = function(db) {
         validateCurrentOrder: function() {
             var callback, currentOrder;
             currentOrder = this.shop.get('selectedOrder');
-	    paidTotal = currentOrder.getPaidTotal();
+	          paidTotal = currentOrder.getPaidTotal();
+	          ledDisplay("Vuelto:",$("#payment-remaining").html());
             impresora_fiscal("PAGO","Pago Recibido___"+paidTotal*100)
-	    ledDisplay("Vuelto:",$("#payment-remaining").html());
+            impresora_fiscal("CERRAR1","CERRAR1")
+            impresora_fiscal("GAVETA","GAVETA")
             $('button#validate-order', this.$element).attr('disabled', 'disabled');
             pos.pushOrder(currentOrder.exportAsJSON()).then(_.bind(function() {
                 $('button#validate-order', this.$element).removeAttr('disabled');
@@ -1074,8 +1076,6 @@ openerp.point_of_sale = function(db) {
             window.print();
         },
         finishOrder: function() {
-            impresora_fiscal("GAVETA","GAVETA")
-            impresora_fiscal("CERRAR1","CERRAR1")
             this.shop.get('selectedOrder').destroy();
         },
         changeSelectedOrder: function() {
