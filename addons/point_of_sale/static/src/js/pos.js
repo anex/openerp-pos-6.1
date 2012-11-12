@@ -1382,7 +1382,8 @@ openerp.point_of_sale = function(db) {
                     lastTimeStamp = new Date().getTime();
                     if (codeNumbers.length == 13) {
                         // a barcode reader
-                        if (!checkEan(codeNumbers)) {
+                      /*
+		        if (!checkEan(codeNumbers)) {
                             // barcode read error, raise warning
                             $(QWeb.render('pos-scan-warning')).dialog({
                                 resizable: false,
@@ -1397,6 +1398,7 @@ openerp.point_of_sale = function(db) {
                                 }
                             });
                         }
+		       */
                         var selectedOrder = self.shop.get('selectedOrder');
                         var scannedProductModel = getProductByEAN(codeNumbers.join(''));
                         if (scannedProductModel === undefined) {
