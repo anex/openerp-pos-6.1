@@ -27,7 +27,7 @@
                         <thead>
                             <tr>
                                 <td>Product</td>
-                                <td>Price</td>
+                                <td>Priceaaa</td>
                                 <td>Disc (%)</td>
                                 <td>Qty</td>
                                 <td>Total</td>
@@ -139,10 +139,10 @@
         </span>
     </t>
     <t t-name="pos-scan-warning">
-        <div>The product could not be recognized. Please contact an employee.</div>
+        <div>El producto no fue encontrado. Por favor contacte a su supervisor</div>
     </t>
     <t t-name="pos-close-warning">
-        <div>There are pending operations that could not be saved into the database, are you sure you want to exit?</div>
+        <div>Hay operaciones pendientes que puede ser que aun no esten guardadas en la base de datos, Esta usted seguro de que quiere salir ?</div>
     </t>
     <t t-name="pos-category-template">
         <header>
