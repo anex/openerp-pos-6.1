@@ -1403,7 +1403,7 @@ openerp.point_of_sale = function(db) {
                         var scannedProductModel = getProductByEAN(codeNumbers.join(''));
                         if (scannedProductModel === undefined) {
                             // product not recognized, raise warning
-                            $(QWeb.render('pos-scan-warning')).dialog({
+                           /* $(QWeb.render('pos-scan-warning')).dialog({
                                 resizable: false,
                                 height:220,
                                 modal: true,
@@ -1414,7 +1414,7 @@ openerp.point_of_sale = function(db) {
                                         return;
                                     },
                                 }
-                            });
+                            });*/
                         } else {
                             selectedOrder.addProduct(new Product(scannedProductModel));
                         }
