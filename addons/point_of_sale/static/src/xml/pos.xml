@@ -56,19 +56,19 @@
                         <button class="input-button number-char">1</button>
                         <button class="input-button number-char">2</button>
                         <button class="input-button number-char">3</button>
-                        <button class="auth-button" data-mode='quantity'>Elim.</button>
+                        <button class="mode-button" data-mode='quantity'>Correg.</button>
                         <br />
                         <button class="input-button number-char">4</button>
                         <button class="input-button number-char">5</button>
                         <button class="input-button number-char">6</button>
-                        <button class="mode-button" data-mode='discount'>Canc.</button>
+                        <button class="report-button" data-mode='Z'>Rep Z</button>
                         <br />
                         <button class="input-button number-char">7</button>
                         <button class="input-button number-char">8</button>
                         <button class="input-button number-char">9</button>
-                        <button class="mode-button" data-mode='list_price'>Rep.</button>
+                        <button class="report-button" data-mode='X'>Rep X</button>
                         <br />
-                        <button class="input-button" id="numpad-minus" >+/-</button>
+                        <button class="report-button" id="devolucion" >Devol.</button>
                         <button class="input-button number-char">0</button>
                         <button class="input-button number-char">.</button>
                         <button class="input-button" id="numpad-backspace">
@@ -147,6 +147,11 @@
     <t t-name="pos-category-template">
         <header>
             <ol class="breadcrumb">
+                <li class="reports">
+                    <a href="javascript:void(0)">
+                        Reportes
+                    </a>
+                </li>
                 <li class="oe-pos-categories-list">
                     <a href="javascript:void(0)">
                         <img src="/point_of_sale/static/src/img/home.png" class="homeimg" />
@@ -226,6 +231,18 @@
     </t>
     <t t-name="pos-order-selector-button-template">
         <button class="select-order"><t t-esc="widget.order.get('creationDate').toString('t')"/></button>
+    </t>
+    <t t-name="pos-receipt-view2">
+        <div id="receipt-screen" class="step-screen" style="display:none">
+            <header><h2>Receipt</h2></header>
+            <div class="pos-step-container">
+                <div class="pos-receipt-container">
+                </div>
+                <div class='receipt-buttons'>
+	                <button id="pos-finish-order">Regresar</button>
+                </div>
+            </div>
+        </div>
     </t>
     <t t-name="pos-receipt-view">
         <div id="receipt-screen" class="step-screen" style="display:none">

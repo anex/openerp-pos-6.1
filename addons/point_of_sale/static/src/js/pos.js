@@ -605,7 +605,7 @@ openerp.point_of_sale = function(db) {
             this.$element.find('button#numpad-minus').click(_.bind(this.clickSwitchSign, this));
             this.$element.find('button.number-char').click(_.bind(this.clickAppendNewChar, this));
             this.$element.find('button.mode-button').click(_.bind(this.clickChangeMode, this));
-            this.$element.find('button.auth-button').click(_.bind(this.clickAuthMode, this));
+            this.$element.find('button.report-button').click(_.bind(this.clickAuthMode, this));
         },
         clickDeleteLastChar: function() {
             return this.state.deleteLastChar();
@@ -623,8 +623,21 @@ openerp.point_of_sale = function(db) {
             return this.state.changeMode(newMode);
         },
         clickAuthMode: function(event) {
-	    var newMode = event.currentTarget.attributes['data-mode'].nodeValue;
-	    return this.state.changeMode(newMode);
+	    mode = event.currentTarget.attributes['data-mode'].nodeValue;
+	    var cod = prompt("Delice tarjeta de autorización","")
+	    if (cod == "%23463?"){
+                    alert("Autorizado")
+
+		    if (mode == 'X'){
+            		impresora_fiscal("REPORTEX");
+	    		ledDisplay("IMPRIMIENDO:","Reporte X");
+		    }
+		    if (mode == 'Z'){
+            		impresora_fiscal("REPORTEZ");
+	    		ledDisplay("IMPRIMIENDO:","Reporte Z");
+		    }
+		}
+
         },
         changedMode: function() {
             var mode = this.state.get('mode');
@@ -780,14 +793,15 @@ openerp.point_of_sale = function(db) {
 		param[this.numpadState.get('mode')] = val;
 		var order = this.shop.get('selectedOrder');
 		if (order.get('orderLines').length !== 0) {
-                   if (val > order.selected.get('quantity')){
+                   if (val > order.selected.get('quantity')) {
 
+                    if ((val-order.selected.get('quantity'))<11){
 		   for (var i=0;i<(val-order.selected.get('quantity'));i++)
 		   { 
 		   	impresora_fiscal('PRODUCTO',order.selected.get("name")+"___"+order.selected.get("list_price")*100+"___1")
 		   }
 
-		   order.selected.set(param);
+		   order.selected.set(param);}
 		}else{
 		    var cod = prompt("Delice tarjeta de autorización","")
 		    if (cod == "%23463?"){
