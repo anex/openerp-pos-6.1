@@ -1445,6 +1445,14 @@ openerp.point_of_sale = function(db) {
                     $('.search-clear').fadeOut();
                 }
 
+	console.log(m.length);
+        
+	        if (m.length == 0 && event.keyCode == 13) {
+		  console.log(m);
+		  $(this).val('');
+		  $(this).attr('placeholder','Producto no encontrado !');
+		}
+
                 if (m.length == 1 && event.keyCode == 13) {
                     myproduct = self.shop.get('products').get(m[0]);
                     self.shop.get('selectedOrder').addProduct(myproduct);
@@ -1455,12 +1463,7 @@ openerp.point_of_sale = function(db) {
                 }else{
                     return (self.shop.get('products')).reset(m);
                 }
-		  console.log(m.length);
-                if (m.length == 0 && event.keyCode == 13) {
-		  console.log(m);
-		  $(this).val('');
-		  $(this).attr('placeholder','Producto no encontrado !');
-		}
+		
 
             });
             return $('.search-clear').click( function() {
