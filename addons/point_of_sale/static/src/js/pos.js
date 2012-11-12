@@ -1448,7 +1448,7 @@ openerp.point_of_sale = function(db) {
 	console.log(m.length);
         
 	        if (m.length == 0 && event.keyCode == 13) {
-		  console.log(m);
+		    console.log(m);
 		  $(this).val('');
 		  $(this).attr('placeholder','Producto no encontrado !');
 		}
@@ -1460,6 +1460,7 @@ openerp.point_of_sale = function(db) {
 		    setTimeout(function(){
 				(self.shop.get('products')).reset(products);
 			}, 1000);
+                    $(this).attr('placeholder','Buscar Producto');		  
                 }else{
                     return (self.shop.get('products')).reset(m);
                 }
