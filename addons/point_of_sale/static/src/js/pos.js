@@ -1445,13 +1445,12 @@ openerp.point_of_sale = function(db) {
                     $('.search-clear').fadeOut();
                 }
 
-	console.log(m.length);
         
 	        if (m.length == 0 && event.keyCode == 13) {
 		    console.log(m);
 		  $(this).val('');
 		  $(this).attr('placeholder','Producto no encontrado !');
-		  (self.shop.get('products')).reset(products);
+		  return (self.shop.get('products')).reset(products);
 		}
 
                 if (m.length == 1 && event.keyCode == 13) {
