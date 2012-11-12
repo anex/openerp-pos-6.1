@@ -447,7 +447,7 @@ body.openerp {
 }
 
 .point-of-sale div#order-selector {
-    display: inline;
+    display: none;
 }
 
 .point-of-sale ol#orders {
