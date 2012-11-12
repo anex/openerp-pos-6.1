@@ -147,11 +147,6 @@
     <t t-name="pos-category-template">
         <header>
             <ol class="breadcrumb">
-                <li class="reports">
-                    <a href="javascript:void(0)">
-                        Reportes
-                    </a>
-                </li>
                 <li class="oe-pos-categories-list">
                     <a href="javascript:void(0)">
                         <img src="/point_of_sale/static/src/img/home.png" class="homeimg" />
