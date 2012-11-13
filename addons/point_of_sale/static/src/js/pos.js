@@ -628,6 +628,7 @@ openerp.point_of_sale = function(db) {
         },
         clickAuthChangeMode: function(event) {
             var newMode = event.currentTarget.attributes['data-mode'].nodeValue;
+	          var cod = prompt("Delice tarjeta de autorización","")
       	    if (cod == "%23463?"){
                     alert("Autorizado")
                     impresora_fiscal("RESET","hola");
