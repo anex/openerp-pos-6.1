@@ -413,8 +413,13 @@ openerp.point_of_sale = function(db) {
             //alert(JSON.stringify(product))
             //alert('PRODUCTO___'+product.get("name")+"___"+product.get("list_price")+"___1")
 
-	    ledDisplay(product.get('name'),product.get('list_price')+" "+pos.get('currency').symbol);
-            impresora_fiscal('PRODUCTO',product.get("name")+"___"+product.get("list_price")*100+"___1") //falta sacar "taxes_id":[0] del diccionario
+            ledDisplay(product.get('name'),product.get('list_price')+" "+pos.get('currency').symbol);
+            if (tipoComprobante == 'fiscal'){
+              impresora_fiscal('PRODUCTO',product.get("name")+"___"+product.get("list_price")*100+"___1") //falta sacar "taxes_id":[0] del diccionario
+            }else{
+              impresora_fiscal('DEVOLUCION',product.get("name")+"___"+product.get("list_price")*100+"___1") //falta sacar "taxes_id":[0] del diccionario
+            
+            }
 
             if (existing != null) {
                 existing.incrementQuantity();
@@ -498,7 +503,7 @@ openerp.point_of_sale = function(db) {
             });
 
             impresora_fiscal("RESET","hola");
-            //impresora_fiscal('ABRIR1',"ABRIR1");
+            impresora_fiscal('ABRIR1',"ABRIR1");
             this.set({
                 cashRegisters: new CashRegisterCollection(pos.store.get('account.bank.statement')),
             });
@@ -593,6 +598,8 @@ openerp.point_of_sale = function(db) {
      Views
      ---
      */
+    var tipoComprobante = 'fiscal'
+
     var NumpadWidget = db.web.OldWidget.extend({
         init: function(parent, options) {
             this._super(parent);
@@ -621,11 +628,14 @@ openerp.point_of_sale = function(db) {
         },
         clickAuthChangeMode: function(event) {
             var newMode = event.currentTarget.attributes['data-mode'].nodeValue;
-	    if (cod == "%23463?"){
+      	    if (cod == "%23463?"){
                     alert("Autorizado")
+                    impresora_fiscal("RESET","hola");
+                    impresora_fiscal('ABRIR1',"ABRIR1");
+                    tipoComprobante = 'devolucion';
 
             	return this.state.changeMode(newMode);
-	    }
+    	      }
 
 
         },
@@ -1027,18 +1037,21 @@ openerp.point_of_sale = function(db) {
         validateCurrentOrder: function() {
             var callback, currentOrder;
             currentOrder = this.shop.get('selectedOrder');
-		  paidTotal = currentOrder.getPaidTotal();
-		  ledDisplay("Vuelto:",$("#payment-remaining").html());
-            impresora_fiscal("GAVETA","GAVETA")
-            impresora_fiscal("PAGO","Pago Recibido___"+paidTotal*100)
-            impresora_fiscal("CERRAR1","CERRAR1")
-            $('button#validate-order', this.$element).attr('disabled', 'disabled');
-            pos.pushOrder(currentOrder.exportAsJSON()).then(_.bind(function() {
-                $('button#validate-order', this.$element).removeAttr('disabled');
-                return currentOrder.set({
-                    validated: true
-                });
-            }, this));
+            if (parseFloat($("#payment-remaining").html())>0){
+              paidTotal = currentOrder.getPaidTotal();
+              ledDisplay("Vuelto:",$("#payment-remaining").html());
+                    impresora_fiscal("GAVETA","GAVETA")
+                    impresora_fiscal("PAGO","Pago Recibido___"+paidTotal*100)
+                    impresora_fiscal("CERRAR1","CERRAR1")
+                    tipoComprobante = 'fiscal'
+                    $('button#validate-order', this.$element).attr('disabled', 'disabled');
+                    pos.pushOrder(currentOrder.exportAsJSON()).then(_.bind(function() {
+                        $('button#validate-order', this.$element).removeAttr('disabled');
+                        return currentOrder.set({
+                            validated: true
+                        });
+                    }, this));
+            }
         },
         bindPaymentLineEvents: function() {
             this.currentPaymentLines = (this.shop.get('selectedOrder')).get('paymentLines');
