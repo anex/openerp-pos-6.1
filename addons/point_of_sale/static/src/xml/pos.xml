@@ -86,7 +86,7 @@
 
 		<!-- ticket cesta calc -->
 		<div id="ticket-calc" class="step-screen">
-		  <header> <h2> Calculo de Ticket </h2> </header>
+		  <header> <h2 class="pointer" id="ticket-calc-h2"> Calculo de Ticket </h2> </header>
 		  <br />
 		  <div id="ticket_body" class="pos-step-container">
 		    <div>
@@ -108,6 +108,7 @@
 		      </table>
 		      
 		    </div>
+		    <br />
 		    
 		    <div class="pos-payment-buttons">
 		      <button type="button" name="ticket_sumar" id="ticket_sumar"> Sumar </button>
@@ -117,6 +118,7 @@
 		    </div>
 		  </div>
 		</div>
+		<br />
 		<!-- end ticket cesta calc -->
 
                 <div id="payment-screen" class="step-screen" style="display:none">

@@ -500,6 +500,10 @@
     visibility: hidden;
 }
 
+.point-of-sale .pointer {
+    cursor: pointer;
+}
+
 .point-of-sale .step-screen button {
     width: 50%;
     text-align: center;

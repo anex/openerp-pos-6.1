@@ -622,12 +622,10 @@ openerp.point_of_sale = function(db) {
         clickAuthChangeMode: function(event) {
             var newMode = event.currentTarget.attributes['data-mode'].nodeValue;
 	    if (cod == "%23463?"){
-                    alert("Autorizado")
+              alert("Autorizado");
 
             	return this.state.changeMode(newMode);
 	    }
-
-
         },
         clickChangeMode: function(event) {
             var newMode = event.currentTarget.attributes['data-mode'].nodeValue;
@@ -635,9 +633,9 @@ openerp.point_of_sale = function(db) {
         },
         clickAuthMode: function(event) {
 	    mode = event.currentTarget.attributes['data-mode'].nodeValue;
-	    var cod = prompt("Delice tarjeta de autorización","")
+            var cod = prompt("Delice tarjeta de autorización","");
 	    if (cod == "%23463?"){
-                    alert("Autorizado")
+		    alert("Autorizado");
 
 		    if (mode == 'X'){
             		impresora_fiscal("REPORTEX");
@@ -1029,9 +1027,9 @@ openerp.point_of_sale = function(db) {
             currentOrder = this.shop.get('selectedOrder');
 		  paidTotal = currentOrder.getPaidTotal();
 		  ledDisplay("Vuelto:",$("#payment-remaining").html());
-            impresora_fiscal("GAVETA","GAVETA")
-            impresora_fiscal("PAGO","Pago Recibido___"+paidTotal*100)
-            impresora_fiscal("CERRAR1","CERRAR1")
+          impresora_fiscal("GAVETA","GAVETA");
+          impresora_fiscal("PAGO","Pago Recibido___"+paidTotal*100);
+          impresora_fiscal("CERRAR1","CERRAR1");
             $('button#validate-order', this.$element).attr('disabled', 'disabled');
             pos.pushOrder(currentOrder.exportAsJSON()).then(_.bind(function() {
                 $('button#validate-order', this.$element).removeAttr('disabled');
@@ -1065,6 +1063,7 @@ openerp.point_of_sale = function(db) {
             x.appendTo(this.paymentLineList());
         },
         render_element: function() {
+	  console.log('Render Element function');
             this.paymentLineList().empty();
             this.currentPaymentLines.each(_.bind( function(paymentLine) {
                 this.addPaymentLine(paymentLine);
