@@ -526,6 +526,7 @@ openerp.point_of_sale = function(db) {
                 products: new ProductCollection()
             });
 
+	    		  ledDisplay("Bienvenido","a PDVAL");
             impresora_fiscal("RESET","hola");
             impresora_fiscal('ABRIR1',"ABRIR1");
             this.set({
