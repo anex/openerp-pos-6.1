@@ -1036,7 +1036,7 @@ openerp.point_of_sale = function(db) {
         validateCurrentOrder: function() {
             var callback, currentOrder;
             currentOrder = this.shop.get('selectedOrder');
-            if (parseFloat($("#payment-remaining").html())>0){
+            if (parseFloat($("#payment-remaining").html())>0 || tipoComprobante == 'devolucion'){
               paidTotal = currentOrder.getPaidTotal();
               ledDisplay("Vuelto:",$("#payment-remaining").html());
               impresora_fiscal("GAVETA","GAVETA");
