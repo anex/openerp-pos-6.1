@@ -339,12 +339,24 @@ openerp.point_of_sale = function(db) {
             };
         },
         exportAsJSON: function() {
+
+
+        if (tipoComprobante == 'fiscal'){
             return {
                 qty: this.get('quantity'),
                 price_unit: this.get('list_price'),
                 discount: this.get('discount'),
                 product_id: this.get('id')
             };
+        }else{
+             return {
+                qty: -1*this.get('quantity'),
+                price_unit: this.get('list_price'),
+                discount: this.get('discount'),
+                product_id: this.get('id')
+            };       
+        }
+
         },
     });
 
@@ -479,15 +491,27 @@ openerp.point_of_sale = function(db) {
             (this.get('paymentLines')).each(_.bind( function(item) {
                 return paymentLines.push([0, 0, item.exportAsJSON()]);
             }, this));
-            return {
-                name: this.getName(),
-                amount_paid: this.getPaidTotal(),
-                amount_total: this.getTotal(),
-                amount_tax: this.getTax(),
-                amount_return: this.getChange(),
-                lines: orderLines,
-                statement_ids: paymentLines
-            };
+            if (tipoComprobante == 'fiscal'){
+                    return {
+                        name: this.getName(),
+                        amount_paid: this.getPaidTotal(),
+                        amount_total: this.getTotal(),
+                        amount_tax: this.getTax(),
+                        amount_return: this.getChange(),
+                        lines: orderLines,
+                        statement_ids: paymentLines
+                    };
+             }else{
+                    return {
+                        name: this.getName(),
+                        amount_paid: this.getPaidTotal(),
+                        amount_total: -1*this.getTotal(),
+                        amount_tax: -1*this.getTax(),
+                        amount_return: this.getChange(),
+                        lines: orderLines,
+                        statement_ids: paymentLines
+                    };
+             }
         },
     });
 
