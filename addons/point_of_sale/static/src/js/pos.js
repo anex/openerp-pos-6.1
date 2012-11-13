@@ -339,12 +339,24 @@ openerp.point_of_sale = function(db) {
             };
         },
         exportAsJSON: function() {
+
+
+        if (tipoComprobante == 'fiscal'){
             return {
                 qty: this.get('quantity'),
                 price_unit: this.get('list_price'),
                 discount: this.get('discount'),
                 product_id: this.get('id')
             };
+        }else{
+             return {
+                qty: -1*this.get('quantity'),
+                price_unit: this.get('list_price'),
+                discount: this.get('discount'),
+                product_id: this.get('id')
+            };       
+        }
+
         },
     });
 
@@ -479,15 +491,27 @@ openerp.point_of_sale = function(db) {
             (this.get('paymentLines')).each(_.bind( function(item) {
                 return paymentLines.push([0, 0, item.exportAsJSON()]);
             }, this));
-            return {
-                name: this.getName(),
-                amount_paid: this.getPaidTotal(),
-                amount_total: this.getTotal(),
-                amount_tax: this.getTax(),
-                amount_return: this.getChange(),
-                lines: orderLines,
-                statement_ids: paymentLines
-            };
+            if (tipoComprobante == 'fiscal'){
+                    return {
+                        name: this.getName(),
+                        amount_paid: this.getPaidTotal(),
+                        amount_total: this.getTotal(),
+                        amount_tax: this.getTax(),
+                        amount_return: this.getChange(),
+                        lines: orderLines,
+                        statement_ids: paymentLines
+                    };
+             }else{
+                    return {
+                        name: this.getName(),
+                        amount_paid: this.getPaidTotal(),
+                        amount_total: -1*this.getTotal(),
+                        amount_tax: -1*this.getTax(),
+                        amount_return: this.getChange(),
+                        lines: orderLines,
+                        statement_ids: paymentLines
+                    };
+             }
         },
     });
 
@@ -502,6 +526,7 @@ openerp.point_of_sale = function(db) {
                 products: new ProductCollection()
             });
 
+	    		  ledDisplay("Bienvenido","a PDVAL");
             impresora_fiscal("RESET","hola");
             impresora_fiscal('ABRIR1',"ABRIR1");
             this.set({
@@ -1036,7 +1061,7 @@ openerp.point_of_sale = function(db) {
         validateCurrentOrder: function() {
             var callback, currentOrder;
             currentOrder = this.shop.get('selectedOrder');
-            if (parseFloat($("#payment-remaining").html())>0 || tipoComprobante == 'devolucion'){
+            if (parseFloat($("#payment-remaining").html())>=0 || tipoComprobante == 'devolucion'){
               paidTotal = currentOrder.getPaidTotal();
               ledDisplay("Vuelto:",$("#payment-remaining").html());
               impresora_fiscal("SUBTOTAL","SUBTOTAL");
