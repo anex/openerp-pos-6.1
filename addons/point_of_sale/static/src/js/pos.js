@@ -1080,6 +1080,7 @@ mynameis(arguments.callee.toString());
         },
         addPaymentLine: function(newPaymentLine) {
 mynameis(arguments.callee.toString());
+	  console.log('esto es addPaymentLine');
             var x = new PaymentlineWidget(null, {
                     model: newPaymentLine
                 });
@@ -1098,6 +1099,7 @@ mynameis(arguments.callee.toString());
         },
         updatePaymentSummary: function() {
 mynameis(arguments.callee.toString());
+	  console.log('esto es updatePaymentSummary');
             var currentOrder, dueTotal, paidTotal, remaining, remainingAmount;
             currentOrder = this.shop.get('selectedOrder');
             paidTotal = currentOrder.getPaidTotal();
