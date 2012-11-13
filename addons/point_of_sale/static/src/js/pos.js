@@ -1004,6 +1004,7 @@ openerp.point_of_sale = function(db) {
 			this.render_element();
         },
         render_element: function() {
+
 		this.amount = this.model.get('amount');
             this.$element.html(this.template_fct({
                 name: (this.model.get('journal_id'))[1],
@@ -1076,10 +1077,13 @@ openerp.point_of_sale = function(db) {
                 });
             x.on_delete.add(_.bind(this.deleteLine, this, x));
             x.appendTo(this.paymentLineList());
+
+	  // Load Ticket Cesta calculator
+	  $('div#ticket_body').hidden();
+	  $('div#ticket-calc').show();
         },
         render_element: function() {
-	  console.log('Render Element function');
-            this.paymentLineList().empty();
+	    this.paymentLineList().empty();
             this.currentPaymentLines.each(_.bind( function(paymentLine) {
                 this.addPaymentLine(paymentLine);
             }, this));
