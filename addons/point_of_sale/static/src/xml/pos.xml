@@ -88,26 +88,25 @@
 		<div id="ticket-calc" class="step-screen">
 		  <header> <h2> Calculo de Ticket </h2> </header>
 		  <br />
-		  <div id="ticket_body">
-		    <div class="pos-step-container">
-		      <div class="pos-payment-container">
-			<table>
-			  <tbody>
-			    <tr>
-			      <td class="paymentline-type">Cantidad</td> 
-			      <td> <input type="text" name="cantidad" id="cantidad"/> </td>
-			    </tr> 
-			    <tr>
-			      <td class="paymentline-type">Valor </td> 
-			      <td> <input type="text" name="valor" id="valor"/> </td>
-			    </tr> 
-			    <tr>
-			      <td class="paymentline-type">Total</td> 
-			      <td> <input readonly="readonly" type="text" name="total" id="total"/> </td>
-			    </tr> 
-			  </tbody>
-			</table>
-		      </div>
+		  <div id="ticket_body" class="pos-step-container">
+		    <div>
+		      <table>
+			<tbody>
+			  <tr>
+			    <td class="paymentline-type">Cantidad</td> 
+			    <td> <input type="text" name="cantidad" id="cantidad"/> </td>
+			  </tr> 
+			  <tr>
+			    <td class="paymentline-type">Valor </td> 
+			    <td> <input type="text" name="valor" id="valor"/> </td>
+			  </tr> 
+			  <tr>
+			    <td class="paymentline-type">Total</td> 
+			    <td> <input readonly="readonly" type="text" name="total" id="total"/> </td>
+			  </tr> 
+			</tbody>
+		      </table>
+		      
 		    </div>
 		    
 		    <div class="pos-payment-buttons">
