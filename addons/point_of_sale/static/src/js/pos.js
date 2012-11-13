@@ -772,6 +772,7 @@ openerp.point_of_sale = function(db) {
         render_element: function() {
             this.$element.html(this.template_fct(this.model.toJSON()));
             this.select();
+            this.ShopView.NumpadView.state.switchSign();
         },
         refresh: function() {
             this.render_element();
