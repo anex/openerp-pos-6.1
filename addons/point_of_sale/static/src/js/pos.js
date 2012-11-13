@@ -1003,7 +1003,7 @@ openerp.point_of_sale = function(db) {
 			this.render_element();
         },
         render_element: function() {
-mynameis(arguments.callee.toString());
+
 		this.amount = this.model.get('amount');
             this.$element.html(this.template_fct({
                 name: (this.model.get('journal_id'))[1],
@@ -1027,7 +1027,6 @@ mynameis(arguments.callee.toString());
             return this.$element.find('#paymentlines');
         },
         start: function() {
-mynameis(arguments.callee.toString());
             $('button#validate-order', this.$element).click(_.bind(this.validateCurrentOrder, this));
             $('.oe-back-to-products', this.$element).click(_.bind(this.back, this));
         },
