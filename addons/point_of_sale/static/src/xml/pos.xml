@@ -158,6 +158,10 @@
                             </table>
                         </div>
                         <div class="pos-payment-buttons">
+                            <button class="oe-back-to-products">
+                                <img src="/web/static/src/img/icons/gtk-go-back.png"></img>
+                                Back to Products</button>
+
                             <button id="validate-order">
                                 <img src="/web/static/src/img/icons/gtk-apply.png"></img>
                                 Validate</button>
@@ -280,10 +284,11 @@
     <t t-name="pos-receipt-view">
         <div id="receipt-screen" class="step-screen" style="display:none">
             <header><h2>Receipt</h2></header>
-        <div class='receipt-buttons'>
-          <button id="pos-finish-order">Next Order</button>
-        </div>
             <div class="pos-step-container">
+                <div class='receipt-buttons'>
+                  <button id="pos-finish-order">Next Order</button>
+                </div>
+
                 <div class="pos-receipt-container">
                 </div>
             </div>

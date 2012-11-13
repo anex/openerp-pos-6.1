@@ -687,7 +687,6 @@ openerp.point_of_sale = function(db) {
             if (this.shop.get('selectedOrder').get('step') === 'receipt')
                 return;
 
-            impresora_fiscal("SUBTOTAL","SUBTOTAL");
 	    currentOrder = this.shop.get('selectedOrder');
 	    dueTotal = currentOrder.getTotal();
 	    ledDisplay("Total:",dueTotal.toFixed(2)+" "+pos.get('currency').symbol);
@@ -1045,9 +1044,10 @@ mynameis(arguments.callee.toString());
         validateCurrentOrder: function() {
             var callback, currentOrder;
             currentOrder = this.shop.get('selectedOrder');
-            if (parseFloat($("#payment-remaining").html())>0){
+            if (parseFloat($("#payment-remaining").html())>0 || tipoComprobante == 'devolucion'){
               paidTotal = currentOrder.getPaidTotal();
               ledDisplay("Vuelto:",$("#payment-remaining").html());
+              impresora_fiscal("SUBTOTAL","SUBTOTAL");
               impresora_fiscal("GAVETA","GAVETA");
               impresora_fiscal("PAGO","Pago Recibido___"+paidTotal*100);
               impresora_fiscal("CERRAR1","CERRAR1");
