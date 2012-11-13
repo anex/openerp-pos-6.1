@@ -68,7 +68,7 @@
                         <button class="input-button number-char">9</button>
                         <button class="report-button" data-mode='X'>Rep X</button>
                         <br />
-                        <button class="auth-button" id="devolucion" >Devol.</button>
+                        <button class="auth-button" data-mode="devolucion" >Devol.</button>
                         <button class="input-button number-char">0</button>
                         <button class="input-button number-char">.</button>
                         <button class="input-button" id="numpad-backspace">
