@@ -631,7 +631,7 @@ openerp.point_of_sale = function(db) {
       	    if (cod == "%23463?"){
                     alert("Autorizado")
                     impresora_fiscal("RESET","hola");
-                    impresora_fiscal('ABRIR1',"ABRIR1");
+                    impresora_fiscal('ABRIR2',"ABRIR2");
                     tipoComprobante = 'devolucion';
 
             	return this.state.changeMode(newMode);
