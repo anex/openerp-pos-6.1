@@ -2,6 +2,13 @@ openerp.point_of_sale = function(db) {
     
     db.point_of_sale = {};
 
+  function mynameis(name) {
+
+     name = name.substr('function '.length);
+     name = name.substr(0, name.indexOf('('));
+     console.log(name);
+  }
+
     function ledDisplay(line1,line2){
             try{
                 if (window.XMLHttpRequest)
@@ -1004,6 +1011,7 @@ openerp.point_of_sale = function(db) {
 			this.render_element();
         },
         render_element: function() {
+mynameis(arguments.callee.toString());
 		this.amount = this.model.get('amount');
             this.$element.html(this.template_fct({
                 name: (this.model.get('journal_id'))[1],
@@ -1027,6 +1035,7 @@ openerp.point_of_sale = function(db) {
             return this.$element.find('#paymentlines');
         },
         start: function() {
+mynameis(arguments.callee.toString());
             $('button#validate-order', this.$element).click(_.bind(this.validateCurrentOrder, this));
             $('.oe-back-to-products', this.$element).click(_.bind(this.back, this));
         },
@@ -1070,6 +1079,7 @@ openerp.point_of_sale = function(db) {
             this.render_element();
         },
         addPaymentLine: function(newPaymentLine) {
+mynameis(arguments.callee.toString());
             var x = new PaymentlineWidget(null, {
                     model: newPaymentLine
                 });
@@ -1077,8 +1087,7 @@ openerp.point_of_sale = function(db) {
             x.appendTo(this.paymentLineList());
         },
         render_element: function() {
-	  console.log('Render Element function');
-            this.paymentLineList().empty();
+	    this.paymentLineList().empty();
             this.currentPaymentLines.each(_.bind( function(paymentLine) {
                 this.addPaymentLine(paymentLine);
             }, this));
@@ -1088,6 +1097,7 @@ openerp.point_of_sale = function(db) {
 		this.currentPaymentLines.remove([lineWidget.model]);
         },
         updatePaymentSummary: function() {
+mynameis(arguments.callee.toString());
             var currentOrder, dueTotal, paidTotal, remaining, remainingAmount;
             currentOrder = this.shop.get('selectedOrder');
             paidTotal = currentOrder.getPaidTotal();
