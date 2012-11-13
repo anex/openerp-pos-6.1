@@ -1082,7 +1082,12 @@ openerp.point_of_sale = function(db) {
 	  $('div#ticket-calc').attr('style','display:block;visibility:visible');
 	  
 	  $('h2#ticket-calc-h2').click(function(){
-            console.log('click en ticket h2');
+            var style = $('#ticket_body').attr('style'); 
+	    if (style == 'display:none'){
+	      $('#ticket_body').attr('style','display:block');
+	    } else if (style == 'display:block'){
+      	      $('#ticket_body').attr('style','display:none');
+	    }
 	  });
         },
         render_element: function() {
