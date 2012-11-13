@@ -1078,8 +1078,9 @@ openerp.point_of_sale = function(db) {
             x.appendTo(this.paymentLineList());
 
 	  // Load Ticket Cesta calculator
-	  $('div#ticket_body').hidden();
-	  $('div#ticket-calc').show();
+	  $('div#ticket_body').attr('style','display:none');
+	  $('div#ticket-calc').attr('style','display:block;visibility:visible');
+
         },
         render_element: function() {
 	    this.paymentLineList().empty();
