@@ -1436,7 +1436,7 @@ openerp.point_of_sale = function(db) {
                 var m, s, myproduct;
                 s = $(this).val().toLowerCase();
                 if (s) {
-                    m = products.filter( function(p) {
+                    m = allProducts.filter( function(p) {
                         return (String(p.code).toLowerCase().indexOf(s) != -1) || (String(p.ean13).toLowerCase().indexOf(s) != -1) || (p.name.toLowerCase().indexOf(s) != -1);
                     });
                     $('.search-clear').fadeIn();
