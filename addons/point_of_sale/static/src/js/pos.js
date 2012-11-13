@@ -1110,7 +1110,7 @@ openerp.point_of_sale = function(db) {
             var style = $('#ticket_body').attr('style'); 
 	    if (style == 'display:none'){
 	      $('#ticket_body').attr('style','');
-	    } else if (style == 'display:block'){
+	    } else if (style == ''){
       	      $('#ticket_body').attr('style','display:none');
 	    }
 	  });
