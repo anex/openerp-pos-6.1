@@ -605,6 +605,7 @@ openerp.point_of_sale = function(db) {
             this.$element.find('button#numpad-minus').click(_.bind(this.clickSwitchSign, this));
             this.$element.find('button.number-char').click(_.bind(this.clickAppendNewChar, this));
             this.$element.find('button.mode-button').click(_.bind(this.clickChangeMode, this));
+            this.$element.find('button.auth-button').click(_.bind(this.clickAuthChangeMode, this));
             this.$element.find('button.report-button').click(_.bind(this.clickAuthMode, this));
         },
         clickDeleteLastChar: function() {
@@ -617,6 +618,16 @@ openerp.point_of_sale = function(db) {
             var newChar;
             newChar = event.currentTarget.innerText || event.currentTarget.textContent;
             return this.state.appendNewChar(newChar);
+        },
+        clickAuthChangeMode: function(event) {
+            var newMode = event.currentTarget.attributes['data-mode'].nodeValue;
+	    if (cod == "%23463?"){
+                    alert("Autorizado")
+
+            	return this.state.changeMode(newMode);
+	    }
+
+
         },
         clickChangeMode: function(event) {
             var newMode = event.currentTarget.attributes['data-mode'].nodeValue;
