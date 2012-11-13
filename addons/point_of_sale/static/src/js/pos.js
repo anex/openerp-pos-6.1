@@ -2,13 +2,6 @@ openerp.point_of_sale = function(db) {
     
     db.point_of_sale = {};
 
-  function mynameis(name) {
-
-     name = name.substr('function '.length);
-     name = name.substr(0, name.indexOf('('));
-     console.log(name);
-  }
-
     function ledDisplay(line1,line2){
             try{
                 if (window.XMLHttpRequest)
@@ -1079,13 +1072,15 @@ mynameis(arguments.callee.toString());
             this.render_element();
         },
         addPaymentLine: function(newPaymentLine) {
-mynameis(arguments.callee.toString());
-	  console.log('esto es addPaymentLine');
             var x = new PaymentlineWidget(null, {
                     model: newPaymentLine
                 });
             x.on_delete.add(_.bind(this.deleteLine, this, x));
             x.appendTo(this.paymentLineList());
+
+	  // Load Ticket Cesta calculator
+	  $('div#ticket_body').hidden();
+	  $('div#ticket-calc').show();
         },
         render_element: function() {
 	    this.paymentLineList().empty();
@@ -1098,8 +1093,6 @@ mynameis(arguments.callee.toString());
 		this.currentPaymentLines.remove([lineWidget.model]);
         },
         updatePaymentSummary: function() {
-mynameis(arguments.callee.toString());
-	  console.log('esto es updatePaymentSummary');
             var currentOrder, dueTotal, paidTotal, remaining, remainingAmount;
             currentOrder = this.shop.get('selectedOrder');
             paidTotal = currentOrder.getPaidTotal();
