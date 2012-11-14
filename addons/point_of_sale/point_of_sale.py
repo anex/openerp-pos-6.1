@@ -285,7 +285,7 @@ class pos_order(osv.osv):
             args['date'] = data['payment_date']
         args['name'] = order.name
         if data.get('payment_name', False):
-            args['name'] = args['name'] + ': ' + data['payment_name']
+            args['name'] = str(args['name']) + ': ' + str(data['payment_name'])
         account_def = property_obj.get(cr, uid, 'property_account_receivable', 'res.partner', context=context)
         args['account_id'] = (order.partner_id and order.partner_id.property_account_receivable \
                              and order.partner_id.property_account_receivable.id) or (account_def and account_def.id) or False

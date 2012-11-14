@@ -12,7 +12,7 @@ openerp.point_of_sale = function(db) {
                   {// code for IE6, IE5
                   xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
                   }
-                  xmlhttp.open("GET","http://localhost:8100/"+String(line1)+"___"+String(line2),false);
+                  xmlhttp.open("GET","http://127.0.0.1:8100/"+String(line1)+"___"+String(line2),false);
                   xmlhttp.send();
                 }catch(err){
             }
@@ -28,7 +28,7 @@ openerp.point_of_sale = function(db) {
               {// code for IE6, IE5  
               xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");  
               }  
-              xmlhttp.open("GET","http://localhost:8200/"+String(line1)+"___"+String(line2),false);  
+              xmlhttp.open("GET","http://127.0.0.1:8200/"+String(line1)+"___"+String(line2),false);  
               xmlhttp.send();  
             }catch(err){  
         }  
@@ -398,12 +398,13 @@ openerp.point_of_sale = function(db) {
         initialize: function(attributes){
             Backbone.Model.prototype.initialize.apply(this, arguments);
 
+	    		  ledDisplay("Bienvenido","a PDVAL");
             impresora_fiscal('ABRIR1',"ABRIR1");
             this.set({
                 creationDate:   new Date,
                 orderLines:     new OrderlineCollection,
                 paymentLines:   new PaymentlineCollection,
-                name:           "Order " + this.generateUniqueId(),
+                name:           this.generateUniqueId(),
             });
             this.bind('change:validated', this.validatedChanged);
             return this;
@@ -424,8 +425,7 @@ openerp.point_of_sale = function(db) {
             existing = (this.get('orderLines')).get(product.id);
             //alert(JSON.stringify(product))
             //alert('PRODUCTO___'+product.get("name")+"___"+product.get("list_price")+"___1")
-
-            ledDisplay(product.get('name'),product.get('list_price')+" "+pos.get('currency').symbol);
+            //
             if (tipoComprobante == 'fiscal'){
               impresora_fiscal('PRODUCTO',product.get("name")+"___"+product.get("list_price")*100+"___1") //falta sacar "taxes_id":[0] del diccionario
             }else{
@@ -442,6 +442,9 @@ openerp.point_of_sale = function(db) {
                     this.get('orderLines').remove(line);
                 }, this);
             }
+            dueTotal = this.getTotal();
+            ledDisplay(product.get('name'),pos.get('currency').symbol+product.get('list_price')+" T:"+dueTotal.toFixed(2)+"");
+
         },
         addPaymentLine: function(cashRegister) {
             var newPaymentline;
@@ -653,12 +656,38 @@ openerp.point_of_sale = function(db) {
         },
         clickAuthChangeMode: function(event) {
             var newMode = event.currentTarget.attributes['data-mode'].nodeValue;
-          var cod = prompt("Delice tarjeta de autorización","");
-      	    if (cod == "%23463?"){
-                    alert("Autorizado")
-                    impresora_fiscal("RESET","hola");
-                    impresora_fiscal('ABRIR2',"ABRIR2");
-                    tipoComprobante = 'devolucion';
+            var cod = prompt("Delice tarjeta de autorización","");
+      	    if (cod == "123"){
+                    var referencia = prompt("Indique numero de Referencia","PDVAL1352866617638");
+                    alert(referencia)
+                    pos.fetch('pos.order', ['name', 'lines'],[['name', '=', referencia]]).pipe(function(result) {
+                        //alert("uno")
+                        //alert(JSON.stringify(result[0]))
+                            impresora_fiscal("RESET","hola");
+                            impresora_fiscal('ABRIR2',"ABRIR2");
+
+                        _.each(result[0].lines, function (num){
+                            //alert("dos")
+                            
+                        pos.fetch('pos.order.line', ['id', 'product_id','qty'],[['id', '=', num]]).pipe(function(result2) {
+                            //alert(JSON.stringify(result2[0].product_id))
+                            m = allProducts.filter( function(p) {                         
+                            if (p.id == result2[0].product_id[0]){
+                              //alert(num+" "+result2[0].product_id[0]+" "+p.name+" "+result2[0].qty)
+                              _.each(_.range(0,result2[0].qty),function()  {
+
+                                //alert(num+" "+result2[0].product_id[0]+" "+p.name+" "+p.list_price)
+                                impresora_fiscal('DEVOLUCION',p.name+"___"+p.list_price*100+"___1")
+
+                              })
+                            }
+                            });                
+
+                        })
+                        })
+                    })
+
+                    //tipoComprobante = 'devolucion'; //Ya no se utiliza porque la devolucion es automatica
 
             	return this.state.changeMode(newMode);
     	      }
@@ -855,6 +884,10 @@ openerp.point_of_sale = function(db) {
 			   for (var i=0;i<(antes-ahora);i++)
 			   { 
 				impresora_fiscal('ANULACION',order.selected.get("name")+"___"+order.selected.get("list_price")*100+"___1")
+            order = this.shop.get('selectedOrder');
+            dueTotal = order.getTotal();
+            ledDisplay("Total:",dueTotal.toFixed(2));
+
 			   }
 
 
@@ -1067,6 +1100,7 @@ openerp.point_of_sale = function(db) {
               impresora_fiscal("SUBTOTAL","SUBTOTAL");
               impresora_fiscal("GAVETA","GAVETA");
               impresora_fiscal("PAGO","Pago Recibido___"+paidTotal*100);
+              impresora_fiscal("ESCRIBIR","Referencia: "+currentOrder.get('name'));
               impresora_fiscal("CERRAR1","CERRAR1");
               tipoComprobante = 'fiscal';
                     $('button#validate-order', this.$element).attr('disabled', 'disabled');
@@ -1287,8 +1321,9 @@ openerp.point_of_sale = function(db) {
         createNewOrder: function() {
             var newOrder;
             newOrder = new Order;
+	    		  ledDisplay("Bienvenido","a PDVAL");
             impresora_fiscal('ABRIR1',"ABRIR1");
-	    ledDisplay("@chavezcandanga: ...","      PDVAL");
+       	    ledDisplay("@chavezcandanga: ...","      PDVAL");
             (this.shop.get('orders')).add(newOrder);
             this.shop.set({
                 selectedOrder: newOrder
