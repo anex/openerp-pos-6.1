@@ -12,7 +12,7 @@ openerp.point_of_sale = function(db) {
                   {// code for IE6, IE5
                   xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
                   }
-                  xmlhttp.open("GET","http://localhost:8100/"+String(line1)+"___"+String(line2),false);
+                  xmlhttp.open("GET","http://127.0.0.1:8100/"+String(line1)+"___"+String(line2),false);
                   xmlhttp.send();
                 }catch(err){
             }
@@ -28,7 +28,7 @@ openerp.point_of_sale = function(db) {
               {// code for IE6, IE5  
               xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");  
               }  
-              xmlhttp.open("GET","http://localhost:8200/"+String(line1)+"___"+String(line2),false);  
+              xmlhttp.open("GET","http://127.0.0.1:8200/"+String(line1)+"___"+String(line2),false);  
               xmlhttp.send();  
             }catch(err){  
         }  
@@ -403,7 +403,7 @@ openerp.point_of_sale = function(db) {
                 creationDate:   new Date,
                 orderLines:     new OrderlineCollection,
                 paymentLines:   new PaymentlineCollection,
-                name:           "Order " + this.generateUniqueId(),
+                name:           "PDVAL" + this.generateUniqueId(),
             });
             this.bind('change:validated', this.validatedChanged);
             return this;
@@ -424,8 +424,10 @@ openerp.point_of_sale = function(db) {
             existing = (this.get('orderLines')).get(product.id);
             //alert(JSON.stringify(product))
             //alert('PRODUCTO___'+product.get("name")+"___"+product.get("list_price")+"___1")
+            //
+            dueTotal = this.getTotal();
 
-            ledDisplay(product.get('name'),product.get('list_price')+" "+pos.get('currency').symbol);
+            ledDisplay(product.get('name'),product.get('list_price')+" "+pos.get('currency').symbol+" (T:"+dueTotal+")");
             if (tipoComprobante == 'fiscal'){
               impresora_fiscal('PRODUCTO',product.get("name")+"___"+product.get("list_price")*100+"___1") //falta sacar "taxes_id":[0] del diccionario
             }else{
@@ -1067,6 +1069,7 @@ openerp.point_of_sale = function(db) {
               impresora_fiscal("SUBTOTAL","SUBTOTAL");
               impresora_fiscal("GAVETA","GAVETA");
               impresora_fiscal("PAGO","Pago Recibido___"+paidTotal*100);
+              impresora_fiscal("ESCRIBIR","Referencia: "+currentOrder.get('name'));
               impresora_fiscal("CERRAR1","CERRAR1");
               tipoComprobante = 'fiscal';
                     $('button#validate-order', this.$element).attr('disabled', 'disabled');
