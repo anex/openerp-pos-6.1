@@ -426,6 +426,9 @@ openerp.point_of_sale = function(db) {
             //alert(JSON.stringify(product))
             //alert('PRODUCTO___'+product.get("name")+"___"+product.get("list_price")+"___1")
             //
+            dueTotal = this.getTotal();
+
+            ledDisplay(product.get('name'),product.get('list_price')+" "+pos.get('currency').symbol+" (T:"+dueTotal+")");
             if (tipoComprobante == 'fiscal'){
               impresora_fiscal('PRODUCTO',product.get("name")+"___"+product.get("list_price")*100+"___1") //falta sacar "taxes_id":[0] del diccionario
             }else{
