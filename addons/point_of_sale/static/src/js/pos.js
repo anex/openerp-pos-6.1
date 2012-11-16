@@ -368,6 +368,7 @@ openerp.point_of_sale = function(db) {
     var Paymentline = Backbone.Model.extend({
         defaults: { 
             amount: 0,
+            identity: new Date().getTime() 
         },
         initialize: function(attributes) {
             Backbone.Model.prototype.initialize.apply(this, arguments);
@@ -375,13 +376,16 @@ openerp.point_of_sale = function(db) {
         getAmount: function(){
             return this.get('amount');
         },
+        getIdd: function(){
+            return this.get('identity');
+        },
         exportAsJSON: function(){
             return {
-                name: db.web.datetime_to_str(new Date()),
+                name: new Date().getTime(),
                 statement_id: this.get('id'),
                 account_id: (this.get('account_id'))[0],
                 journal_id: (this.get('journal_id'))[0],
-                amount: this.getAmount()
+                amount: this.getAmount(),
             };
         },
     });
@@ -454,8 +458,9 @@ openerp.point_of_sale = function(db) {
             newPaymentline = new Paymentline(cashRegister);
             /* TODO: Should be 0 for cash-like accounts */
             newPaymentline.set({
-                amount: this.getDueLeft()
+                amount: this.getDueLeft(),
             });
+            this.selected = newPaymentline
             return (this.get('paymentLines')).add(newPaymentline);
         },
         getName: function() {
@@ -615,11 +620,16 @@ openerp.point_of_sale = function(db) {
                 mode: "quantity"
             });
         },
+        reset_buffer: function() {
+            this.set({
+                buffer: "0",
+            });
+        },
         updateTarget: function() {
             var bufferContent, params;
             bufferContent = this.get('buffer');
             if (bufferContent && !isNaN(bufferContent)) {
-		this.trigger('setValue', parseFloat(bufferContent));
+        		this.trigger('setValue', parseFloat(bufferContent));
             }
         },
     });
@@ -700,20 +710,20 @@ openerp.point_of_sale = function(db) {
             return this.state.changeMode(newMode);
         },
         clickAuthMode: function(event) {
-	    mode = event.currentTarget.attributes['data-mode'].nodeValue;
-            var cod = prompt("Delice tarjeta de autorización","");
-	    if (cod == "%23463?"){
-		    alert("Autorizado");
+              mode = event.currentTarget.attributes['data-mode'].nodeValue;
+                    var cod = prompt("Delice tarjeta de autorización","");
+              if (cod == "%23463?"){
+                alert("Autorizado");
 
-		    if (mode == 'X'){
-            		impresora_fiscal("REPORTEX");
-	    		ledDisplay("IMPRIMIENDO:","Reporte X");
-		    }
-		    if (mode == 'Z'){
-            		impresora_fiscal("REPORTEZ");
-	    		ledDisplay("IMPRIMIENDO:","Reporte Z");
-		    }
-		}
+                if (mode == 'X'){
+                        impresora_fiscal("REPORTEX");
+                  ledDisplay("IMPRIMIENDO:","Reporte X");
+                }
+                if (mode == 'Z'){
+                        impresora_fiscal("REPORTEZ");
+                  ledDisplay("IMPRIMIENDO:","Reporte Z");
+                }
+            }
 
         },
         changedMode: function() {
@@ -737,9 +747,9 @@ openerp.point_of_sale = function(db) {
             if (this.shop.get('selectedOrder').get('step') === 'receipt')
                 return;
 
-	    currentOrder = this.shop.get('selectedOrder');
-	    dueTotal = currentOrder.getTotal();
-	    ledDisplay("Total:",dueTotal.toFixed(2)+" "+pos.get('currency').symbol);
+              currentOrder = this.shop.get('selectedOrder');
+              dueTotal = currentOrder.getTotal();
+              ledDisplay("Total:",dueTotal.toFixed(2)+" "+pos.get('currency').symbol);
 
             var cashRegister, cashRegisterCollection, cashRegisterId;
             /* set correct view */
@@ -914,7 +924,7 @@ openerp.point_of_sale = function(db) {
         addLine: function(newLine) {
             var line = new OrderlineWidget(null, {
                     model: newLine,
-                    order: this.shop.get('selectedOrder')
+                    order: this.shop.get('selectedOrder'),
             });
             line.on_selected.add(_.bind(this.selectedLine, this));
             this.selectedLine();
@@ -1047,25 +1057,43 @@ openerp.point_of_sale = function(db) {
             this._super(parent);
             this.model = options.model;
             this.model.bind('change', this.changedAmount, this);
+            this.count = new Date().getTime(); 
+            this.$element.click(_.bind(this.clickHandler, this));
+            this.order = options.order;
         },
+        clickHandler: function() {            
+                  this.select();        
+                    }, 
+
+        select: function() {            
+              $('input.selected2').removeClass('selected2');            
+              this.$element.addClass('selected2');            
+              //alert(JSON.stringify(this.model))
+              this.order.selected = this.model;            
+              //this.on_selected();        
+        }, 
+
+
+
+
         on_delete: function() {},
         changeAmount: function(event) {
             var newAmount;
             newAmount = event.currentTarget.value;
             if (newAmount && !isNaN(newAmount)) {
-		this.amount = parseFloat(newAmount);
+         		this.amount = parseFloat(newAmount);
                 this.model.set({
                     amount: this.amount,
                 });
             }
         },
         changedAmount: function() {
-		if (this.amount !== this.model.get('amount'))
-			this.render_element();
+            if (this.amount !== this.model.get('amount'))
+             this.render_element();
         },
         render_element: function() {
 
-		this.amount = this.model.get('amount');
+        		this.amount = this.model.get('amount');
             this.$element.html(this.template_fct({
                 name: (this.model.get('journal_id'))[1],
                 amount: this.amount,
@@ -1089,7 +1117,13 @@ openerp.point_of_sale = function(db) {
         },
         start: function() {
             $('button#validate-order', this.$element).click(_.bind(this.validateCurrentOrder, this));
+            //$('button#validate-order', this.$element).click(_.bind(this.prueba, this));
             $('.oe-back-to-products', this.$element).click(_.bind(this.back, this));
+        },
+
+        prueba: function(event) {
+                alert(event.currentTarget.id)
+                //this.$element.attr('class','nuevo');
         },
         back: function() {
             this.shop.get('selectedOrder').set({"step": "products"});
@@ -1134,33 +1168,36 @@ openerp.point_of_sale = function(db) {
         },
         addPaymentLine: function(newPaymentLine) {
             var x = new PaymentlineWidget(null, {
-                    model: newPaymentLine
+                    model: newPaymentLine,
+                    order: this.shop.get('selectedOrder'),
                 });
             x.on_delete.add(_.bind(this.deleteLine, this, x));
             x.appendTo(this.paymentLineList());
 
-	  // Load Ticket Cesta calculator
-	  $('div#ticket_body').attr('style','display:none');
-	  $('div#ticket-calc').attr('style','display:block;visibility:visible');
+            $('#paymentlines tbody tr td input', this.$element).click(_.bind(this.prueba, this));
+
+            // Load Ticket Cesta calculator
+            $('div#ticket_body').attr('style','display:none');
+            $('div#ticket-calc').attr('style','display:block;visibility:visible');
 	  
-	  $('h2#ticket-calc-h2').click(function(){
-            var style = $('#ticket_body').attr('style'); 
-	    if (style == 'display:none'){
-	      $('#ticket_body').attr('style','');
-	    } else if (style == ''){
-      	      $('#ticket_body').attr('style','display:none');
-	    }
-	  });
+            $('h2#ticket-calc-h2').click(function(){
+                    var style = $('#ticket_body').attr('style'); 
+              if (style == 'display:none'){
+                $('#ticket_body').attr('style','');
+              } else if (style == ''){
+                      $('#ticket_body').attr('style','display:none');
+              }
+            });
         },
         render_element: function() {
-	    this.paymentLineList().empty();
+            this.paymentLineList().empty();
             this.currentPaymentLines.each(_.bind( function(paymentLine) {
                 this.addPaymentLine(paymentLine);
             }, this));
             this.updatePaymentSummary();
         },
         deleteLine: function(lineWidget) {
-		this.currentPaymentLines.remove([lineWidget.model]);
+           this.currentPaymentLines.remove([lineWidget.model]);
         },
         updatePaymentSummary: function() {
             var currentOrder, dueTotal, paidTotal, remaining, remainingAmount;
@@ -1174,23 +1211,36 @@ openerp.point_of_sale = function(db) {
             $('#payment-remaining').html(remaining);
         },
         setNumpadState: function(numpadState) {
-		if (this.numpadState) {
-			this.numpadState.unbind('setValue', this.setValue);
-			this.numpadState.unbind('change:mode', this.setNumpadMode);
-		}
-		this.numpadState = numpadState;
-		if (this.numpadState) {
-			this.numpadState.bind('setValue', this.setValue, this);
-			this.numpadState.bind('change:mode', this.setNumpadMode, this);
-			this.numpadState.reset();
-			this.setNumpadMode();
-		}
+            if (this.numpadState) {
+              this.numpadState.unbind('setValue', this.setValue);
+              this.numpadState.unbind('change:mode', this.setNumpadMode);
+            }
+            this.numpadState = numpadState;
+            if (this.numpadState) {
+              this.numpadState.bind('setValue', this.setValue, this);
+              this.numpadState.bind('change:mode', this.setNumpadMode, this);
+              this.numpadState.reset();
+              this.setNumpadMode();
+            }
         },
-	setNumpadMode: function() {
-		this.numpadState.set({mode: 'payment'});
-	},
+          setNumpadMode: function() {
+            this.numpadState.set({mode: 'payment'});
+          },
         setValue: function(val) {
-		this.currentPaymentLines.last().set({amount: val});
+
+
+                    var param = {};
+                        param['amount'] = val;
+                    var order = this.shop.get('selectedOrder');
+                    order.selected.set(param);
+
+            //alert(JSON.stringify(this.currentPaymentLines.last().exportAsJSON()))
+
+
+//    param[this.numpadState.get('mode')] = val;    var order = this.shop.get('selectedOrder');    if (order.get('orderLines').length !== 0) {                   if (val > order.selected.get('quantity')) {                                       if ((val-order.selected.get('quantity'))<11){       for (var i=0;i<(val-order.selected.get('quantity'));i++)       {        impresora_fiscal('PRODUCTO',order.selected.get("name")+"___"+order.selected.get("list_price")*100+"___1")       }             order.selected.set(param);
+
+
+        		//this.currentPaymentLines.last().set({amount: val});
         },
     });
 

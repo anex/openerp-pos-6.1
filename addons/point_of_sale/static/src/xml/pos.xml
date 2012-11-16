@@ -255,8 +255,8 @@
         <td class="paymentline-type">
             <t t-esc="name"/>
         </td>
-        <td class="paymentline-amount pos-right-align">
-            <input type="text" t-att-value="amount.toFixed(2)" />
+        <td class="paymentline-amount pos-right-align" >
+            <input type="text" t-att-value="amount.toFixed(2)" t-att-id="counter"/>
             <a href='javascript:void(0)' class='delete-payment-line'><img src="/point_of_sale/static/src/img/search_reset.gif" /></a>
         </td>
     </t>
