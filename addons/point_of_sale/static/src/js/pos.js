@@ -1517,6 +1517,7 @@ openerp.point_of_sale = function(db) {
             // The barcode readers acts as a keyboard, we catch all keyup events and try to find a 
             // barcode sequence in the typed keys, then act accordingly.
             $('body').delegate('','keyup', function (e){
+//                $('.searchbox input').blur();
 
                 //We only care about numbers
                 if (!isNaN(Number(String.fromCharCode(e.keyCode)))) {
@@ -1589,10 +1590,10 @@ openerp.point_of_sale = function(db) {
             $('.searchbox input').keyup(function(event) {
                 var m, s, myproduct;
                 s = $(this).val().toLowerCase();
-                if (s && event.keyCode == 13) {
+                if (s) {
                     m = allProducts.filter( function(p) {
-                        //return (String(p.code).toLowerCase().indexOf(s) != -1) || (String(p.ean13).toLowerCase().indexOf(s) != -1) || (p.name.toLowerCase().indexOf(s) != -1);
-                        return (p.name.toLowerCase().indexOf(s) != -1);
+                        return (String(p.code).toLowerCase().indexOf(s) != -1) || (String(p.ean13).toLowerCase().indexOf(s) != -1) || (p.name.toLowerCase().indexOf(s) != -1);
+                        //return (p.name.toLowerCase().indexOf(s) != -1);
                     });
                     $('.search-clear').fadeIn();
                 } else {
@@ -1608,17 +1609,17 @@ openerp.point_of_sale = function(db) {
 		  return (self.shop.get('products')).reset(products);
 		}
 
-                if (m.length == 1 && event.keyCode == 13) {
-                    myproduct = self.shop.get('products').get(m[0]);
-                    self.shop.get('selectedOrder').addProduct(myproduct);
-                    $(this).val('');
-		    setTimeout(function(){
-				(self.shop.get('products')).reset(products);
-			}, 1000);
-                    $(this).attr('placeholder','Buscar Producto');		  
-                }else{
+//                if (m.length == 1 && event.keyCode == 13) {
+//                    myproduct = self.shop.get('products').get(m[0]);
+//                    self.shop.get('selectedOrder').addProduct(myproduct);
+//                    $(this).val('');
+//		    setTimeout(function(){
+//				(self.shop.get('products')).reset(products);
+//			}, 1000);
+//                    $(this).attr('placeholder','Buscar Producto');		  
+//                }else{
                     return (self.shop.get('products')).reset(m);
-                }
+//                }
 		
 
             });
