@@ -381,7 +381,7 @@ openerp.point_of_sale = function(db) {
         },
         exportAsJSON: function(){
             return {
-                name: new Date().getTime(),
+                name: db.web.datetime_to_str(new Date()),  
                 statement_id: this.get('id'),
                 account_id: (this.get('account_id'))[0],
                 journal_id: (this.get('journal_id'))[0],
@@ -432,7 +432,6 @@ openerp.point_of_sale = function(db) {
             //
             dueTotal = this.getTotal();
 
-            ledDisplay(product.get('name'),product.get('list_price')+" "+pos.get('currency').symbol+" (T:"+dueTotal+")");
             if (tipoComprobante == 'fiscal'){
               impresora_fiscal('PRODUCTO',product.get("name")+"___"+product.get("list_price")*100+"___1") //falta sacar "taxes_id":[0] del diccionario
             }else{
@@ -1060,16 +1059,19 @@ openerp.point_of_sale = function(db) {
             this.count = new Date().getTime(); 
             this.$element.click(_.bind(this.clickHandler, this));
             this.order = options.order;
+            options.numpadState.reset()
+            this.numpadState = options.numpadState
         },
         clickHandler: function() {            
                   this.select();        
                     }, 
 
         select: function() {            
-              $('input.selected2').removeClass('selected2');            
+              $('.selected2').removeClass('selected2');            
               this.$element.addClass('selected2');            
               //alert(JSON.stringify(this.model))
               this.order.selected = this.model;            
+              this.numpadState.reset()
               //this.on_selected();        
         }, 
 
@@ -1170,6 +1172,7 @@ openerp.point_of_sale = function(db) {
             var x = new PaymentlineWidget(null, {
                     model: newPaymentLine,
                     order: this.shop.get('selectedOrder'),
+                    numpadState: this.numpadState 
                 });
             x.on_delete.add(_.bind(this.deleteLine, this, x));
             x.appendTo(this.paymentLineList());
@@ -1483,6 +1486,7 @@ openerp.point_of_sale = function(db) {
             // returns a product that has a packaging with an EAN matching to provided ean string. 
             // returns undefined if no such product is found.
             var getProductByEAN = function(ean) {
+                alert(ean)
                 var prefix = ean.substring(0,2);
                 var scannedProductModel = undefined;
                 if (prefix in {'02':'', '22':'', '24':'', '26':'', '28':''}) {
@@ -1532,8 +1536,8 @@ openerp.point_of_sale = function(db) {
                     lastTimeStamp = new Date().getTime();
                     if (codeNumbers.length == 13) {
                         // a barcode reader
-                      /*
-		        if (!checkEan(codeNumbers)) {
+                      
+        		        if (!checkEan(codeNumbers)) {
                             // barcode read error, raise warning
                             $(QWeb.render('pos-scan-warning')).dialog({
                                 resizable: false,
@@ -1548,12 +1552,11 @@ openerp.point_of_sale = function(db) {
                                 }
                             });
                         }
-		       */
                         var selectedOrder = self.shop.get('selectedOrder');
                         var scannedProductModel = getProductByEAN(codeNumbers.join(''));
                         if (scannedProductModel === undefined) {
                             // product not recognized, raise warning
-                           /* $(QWeb.render('pos-scan-warning')).dialog({
+                            $(QWeb.render('pos-scan-warning')).dialog({
                                 resizable: false,
                                 height:220,
                                 modal: true,
@@ -1564,10 +1567,11 @@ openerp.point_of_sale = function(db) {
                                         return;
                                     },
                                 }
-                            });*/
+                            });
                         } else {
                             selectedOrder.addProduct(new Product(scannedProductModel));
                         }
+
 
                         codeNumbers = [];
                     }
@@ -1577,17 +1581,18 @@ openerp.point_of_sale = function(db) {
                 }
             });
 
-            $('.searchbox input').blur(function() { $('.searchbox input').focus(); });
-            setInterval(function(){
-		$('.searchbox input').focus();
-		},1000);
+   //         $('.searchbox input').blur(function() { $('.searchbox input').focus(); });
+   //         setInterval(function(){
+	//	$('.searchbox input').focus();
+	//	},1000);
 	   
             $('.searchbox input').keyup(function(event) {
                 var m, s, myproduct;
                 s = $(this).val().toLowerCase();
-                if (s) {
+                if (s && event.keyCode == 13) {
                     m = allProducts.filter( function(p) {
-                        return (String(p.code).toLowerCase().indexOf(s) != -1) || (String(p.ean13).toLowerCase().indexOf(s) != -1) || (p.name.toLowerCase().indexOf(s) != -1);
+                        //return (String(p.code).toLowerCase().indexOf(s) != -1) || (String(p.ean13).toLowerCase().indexOf(s) != -1) || (p.name.toLowerCase().indexOf(s) != -1);
+                        return (p.name.toLowerCase().indexOf(s) != -1);
                     });
                     $('.search-clear').fadeIn();
                 } else {

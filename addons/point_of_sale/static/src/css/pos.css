@@ -13,6 +13,10 @@
     height: 100%;
 }
 
+.selected2 {
+    background-color: red;
+}
+
 .point-of-sale table {
     border-spacing: 0;
     border-collapse: collapse;
