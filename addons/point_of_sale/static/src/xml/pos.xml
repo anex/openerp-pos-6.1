@@ -98,7 +98,7 @@
 			<tbody>
 			  <tr>
 			    <td class="paymentline-type">Total</td> 
-			    <td> <input readonly="readonly" type="text" name="total" id="total"/> </td>
+			    <td> <input readonly="readonly" type="text" name="totale" id="totale"/> </td>
 			  </tr> 
 			</tbody>
 		      </table>
@@ -110,7 +110,7 @@
 		      <button type="button" name="ticket_sumar" id="ticket_sumar"> Sumar </button>
     		      <button type="button" name="ticket_restar" id="ticket_restar"> Restar </button>
                       <br />
-                      <button type="button" name="ticket_salir" id="ticket_salir"> Cerrar </button> 
+                      <!--- <button type="button" name="ticket_salir" id="ticket_salir"> Cerrar </button>  -->
 		    </div>
 		  </div>
 		</div>
@@ -262,7 +262,7 @@
         <td class="paymentline-type">
             <t t-esc="name"/>
         </td>
-        <td class="paymentline-amount pos-right-align" >
+        <td class="calculator paymentline-amount pos-right-align" >
             <input type="text" t-att-value="amount.toFixed(2)" t-att-id="counter"/>
         </td>
     </t>

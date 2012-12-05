@@ -377,7 +377,6 @@ openerp.point_of_sale = function(db) {
             return this.get('amount');
         },
         setName: function(name){
-            alert(name)
             this.set({'name': name});
         },
         getIdd: function(){
@@ -512,6 +511,7 @@ openerp.point_of_sale = function(db) {
 
         },
         addPaymentLine: function(cashRegister) {
+            //alert("wtf")
             var newPaymentline;
             newPaymentline = new Paymentline(cashRegister);
             /* TODO: Should be 0 for cash-like accounts */
@@ -730,7 +730,7 @@ openerp.point_of_sale = function(db) {
             var cod = prompt("Delice tarjeta de autorización","");
       	    if (cod == "123"){
                     var referencia = prompt("Indique numero de Referencia","PDVAL1352866617638");
-                    alert(referencia)
+                    //alert(referencia)
                     pos.fetch('pos.order', ['name', 'lines'],[['name', '=', referencia]]).pipe(function(result) {
                         //alert("uno")
                         //alert(JSON.stringify(result[0]))
@@ -1119,7 +1119,7 @@ openerp.point_of_sale = function(db) {
             this.order = options.order;
             //options.numpadState.reset()
             this.numpadState = options.numpadState
-            this.render_element()
+        //    this.render_element()
         },
         setNumpad: function(numpad){
             this.numpadState = numpad
@@ -1129,10 +1129,12 @@ openerp.point_of_sale = function(db) {
                     }, 
 
         select: function() {            
-              $('.selected3').removeClass('selected3');            
-              this.$element.addClass('selected3');            
+              //alert("aja!")
+              $('.selected2').removeClass('selected2');            
+              this.$element.addClass('selected2');            
               //alert(JSON.stringify(this.model))
               this.order.selected = this.model;            
+              //alert(JSON.stringify(this.order.selected))
               this.numpadState.reset()
               //this.on_selected();        
         }, 
@@ -1147,13 +1149,21 @@ openerp.point_of_sale = function(db) {
                     amount: this.amount,
                 });
             }
-        },
+                   },
         changedAmount: function() {
             if (this.amount !== this.model.get('amount'))
              this.render_element();
+             try{
+            $('#totale').val(parseFloat($('.calculator input')[0].value)*parseFloat($('.calculator input')[1].value))
+            }catch(err){
+            
+            }
+
         },
         render_element: function() {
-        		this.amount = 0 
+        		this.amount = this.model.get('amount');
+            
+
             this.$element.html(this.template_fct({
                 name: this.model.get("name") ,
                 amount: this.amount,
@@ -1250,8 +1260,23 @@ openerp.point_of_sale = function(db) {
             $('button#validate-order', this.$element).click(_.bind(this.validateCurrentOrder, this));
             //$('button#validate-order', this.$element).click(_.bind(this.prueba, this));
             $('.oe-back-to-products', this.$element).click(_.bind(this.back, this));
+            $('#ticket_sumar', this.$element).click(_.bind(this.sumar_ticket, this));
+            $('#ticket_restar', this.$element).click(_.bind(this.restar_ticket, this));
         },
-
+        sumar_ticket: function(){
+            //alert(this.currentPaymentLines.last().get('amount'))
+            //alert(parseFloat($('#totale').val()))
+            val = parseFloat(this.currentPaymentLines.last().get('amount'))+parseFloat($('#totale').val())
+        
+            this.currentPaymentLines.last().set({amount: val});
+        },
+        restar_ticket: function(){
+            //alert(this.currentPaymentLines.last().get('amount'))
+            //alert(parseFloat($('#totale').val()))
+            val = parseFloat(this.currentPaymentLines.last().get('amount'))-parseFloat($('#totale').val())
+        
+            this.currentPaymentLines.last().set({amount: val});
+        },
         prueba: function(event) {
                 alert(event.currentTarget.id)
                 //this.$element.attr('class','nuevo');
@@ -1282,7 +1307,6 @@ openerp.point_of_sale = function(db) {
         },
         bindPaymentLineEvents: function() {
             this.currentPaymentLines = (this.shop.get('selectedOrder')).get('paymentLines');
-            this.currentPaymentLines = (this.shop.get('selectedOrder')).get('paymentLines');
             this.currentPaymentLines.bind('add', this.addPaymentLine, this);
             this.currentPaymentLines.bind('remove', this.render_element, this);
             this.currentPaymentLines.bind('all', this.updatePaymentSummary, this);
@@ -1297,6 +1321,9 @@ openerp.point_of_sale = function(db) {
             this.currentOrderLines.unbind();
             this.bindOrderLineEvents();
             this.render_element();
+        },
+        clearCalculatorLine: function() {
+            this.calculatorLineList().empty();
         },
         addCalculatorLine: function(ncl) {
             var x = new CalculatorlineWidget(null, {
@@ -1325,6 +1352,23 @@ openerp.point_of_sale = function(db) {
 
             $('#paymentlines tbody tr td input', this.$element).click(_.bind(this.prueba, this));
 
+            
+//          if(this.iscalculatorCreated()){
+
+            this.clearCalculatorLine();
+
+            var calculator = new Calculatorline()
+            calculator.setName("Cantidad")
+            this.addCalculatorLine(calculator);
+
+            var calculator2 = new Calculatorline()
+            calculator2.setName("Valor")
+            this.addCalculatorLine(calculator2);
+
+    //                this.calculatorCreated = 0
+  //          }
+       
+
             // Load Ticket Cesta calculator
             $('div#ticket_body').attr('style','display:none');
             $('div#ticket-calc').attr('style','display:block;visibility:visible');
@@ -1342,25 +1386,26 @@ openerp.point_of_sale = function(db) {
             this.paymentLineList().empty();
             this.currentPaymentLines.each(_.bind( function(paymentLine) {
                 this.addPaymentLine(paymentLine);
+                //alert("renderizando")
             }, this));
             this.updatePaymentSummary();
 
 
 
-            this.calculatorLineList().empty();
-            if(this.iscalculatorCreated()){
+           // this.calculatorLineList().empty();
+            //if(this.iscalculatorCreated()){
 
-                    var calculator = new Calculatorline()
-                    calculator.setName("Cantidad")
-                    this.addCalculatorLine(calculator);
-                    alert("creando calculadora")
+                    //var calculator = new Calculatorline()
+                    //calculator.setName("Cantidad")
+                    //this.addCalculatorLine(calculator);
+                    //alert("creando calculadora")
 
-                    var calculator = new Calculatorline()
-                    calculator.setName("Valor")
-                    this.addCalculatorLine(calculator);
+                    //var calculator = new Calculatorline()
+                    //calculator.setName("Valor")
+                    //this.addCalculatorLine(calculator);
 
-                    this.calculatorCreated = 0
-            }
+                    //this.calculatorCreated = 0
+            //}
         },
         deleteLine: function(lineWidget) {
             this.currentPaymentLines.remove([lineWidget.model]);
@@ -1392,7 +1437,13 @@ openerp.point_of_sale = function(db) {
           setNumpadMode: function() {
             this.numpadState.set({mode: 'payment'});
           },
-        setValue: function(val) {
+
+          setLast: function(val){
+
+            this.currentPaymentLines.last().set({amount: val});
+
+          },
+          setValue: function(val) {
 
 
                     var param = {};
@@ -1649,7 +1700,7 @@ openerp.point_of_sale = function(db) {
             // returns a product that has a packaging with an EAN matching to provided ean string. 
             // returns undefined if no such product is found.
             var getProductByEAN = function(ean) {
-                alert(ean)
+                //alert(ean)
                 var prefix = ean.substring(0,2);
                 var scannedProductModel = undefined;
                 if (prefix in {'02':'', '22':'', '24':'', '26':'', '28':''}) {

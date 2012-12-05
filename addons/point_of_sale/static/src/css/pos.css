@@ -17,6 +17,12 @@
     background-color: red;
 }
 
+.selected3 {
+    background-color: red;
+}
+
+
+
 .point-of-sale table {
     border-spacing: 0;
     border-collapse: collapse;
