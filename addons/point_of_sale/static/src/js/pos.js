@@ -364,6 +364,38 @@ openerp.point_of_sale = function(db) {
         model: Orderline,
     });
 
+    var Calculatorline = Backbone.Model.extend({
+        defaults: { 
+            amount: 0,
+            name: "a",
+            identity: new Date().getTime() 
+        },
+        initialize: function(attributes) {
+            Backbone.Model.prototype.initialize.apply(this, arguments);
+        },
+        getAmount: function(){
+            return this.get('amount');
+        },
+        setName: function(name){
+            alert(name)
+            this.set({'name': name});
+        },
+        getIdd: function(){
+            return this.get('identity');
+        },
+        exportAsJSON: function(){
+            return {
+                name: db.web.datetime_to_str(new Date()),  
+                statement_id: this.get('id'),
+                account_id: (this.get('account_id'))[0],
+                journal_id: (this.get('journal_id'))[0],
+                amount: this.getAmount(),
+            };
+        },
+    });
+
+
+
     // Every PaymentLine has all the attributes of the corresponding CashRegister.
     var Paymentline = Backbone.Model.extend({
         defaults: { 
@@ -389,6 +421,33 @@ openerp.point_of_sale = function(db) {
             };
         },
     });
+
+
+    // Every PaymentLine has all the attributes of the corresponding CashRegister.
+    var CalculadorLine = Backbone.Model.extend({
+        defaults: { 
+            amount: 0,
+            identity: new Date().getTime() 
+        },
+        initialize: function(attributes) {
+            Backbone.Model.prototype.initialize.apply(this, arguments);
+        },
+        getAmount: function(){
+            return this.get('amount');
+        },
+        exportAsJSON: function(){
+            return {
+                name: db.web.datetime_to_str(new Date()),  
+                statement_id: this.get('id'),
+                account_id: (this.get('account_id'))[0],
+                journal_id: (this.get('journal_id'))[0],
+                amount: this.getAmount(),
+            };
+        },
+    });
+
+
+
 
     var PaymentlineCollection = Backbone.Collection.extend({
         model: Paymentline,
@@ -1046,6 +1105,68 @@ openerp.point_of_sale = function(db) {
             return this;
         },
     });
+
+
+    var CalculatorlineWidget = db.web.OldWidget.extend({
+        tag_name: 'tr',
+        template_fct: qweb_template('pos-calculatorline-template'),
+        init: function(parent, options) {
+            this._super(parent);
+            this.model = options.model;
+            this.model.bind('change', this.changedAmount, this);
+            this.count = new Date().getTime(); 
+            this.$element.click(_.bind(this.clickHandler, this));
+            this.order = options.order;
+            //options.numpadState.reset()
+            this.numpadState = options.numpadState
+            this.render_element()
+        },
+        setNumpad: function(numpad){
+            this.numpadState = numpad
+        },
+        clickHandler: function() {            
+                  this.select();        
+                    }, 
+
+        select: function() {            
+              $('.selected3').removeClass('selected3');            
+              this.$element.addClass('selected3');            
+              //alert(JSON.stringify(this.model))
+              this.order.selected = this.model;            
+              this.numpadState.reset()
+              //this.on_selected();        
+        }, 
+
+        on_delete: function() {},
+        changeAmount: function(event) {
+            var newAmount;
+            newAmount = event.currentTarget.value;
+            if (newAmount && !isNaN(newAmount)) {
+         		this.amount = parseFloat(newAmount);
+                this.model.set({
+                    amount: this.amount,
+                });
+            }
+        },
+        changedAmount: function() {
+            if (this.amount !== this.model.get('amount'))
+             this.render_element();
+        },
+        render_element: function() {
+        		this.amount = 0 
+            this.$element.html(this.template_fct({
+                name: this.model.get("name") ,
+                amount: this.amount,
+            }));
+            //this.$element.addClass('paymentline');
+            //$('input', this.$element).keyup(_.bind(this.changeAmount, this));
+            //$('.delete-payment-line', this.$element).click(this.on_delete);
+        },
+    });
+
+
+
+
     /*
      "Payment" step.
      */
@@ -1075,9 +1196,6 @@ openerp.point_of_sale = function(db) {
               //this.on_selected();        
         }, 
 
-
-
-
         on_delete: function() {},
         changeAmount: function(event) {
             var newAmount;
@@ -1105,6 +1223,8 @@ openerp.point_of_sale = function(db) {
             $('.delete-payment-line', this.$element).click(this.on_delete);
         },
     });
+
+
     var PaymentWidget = db.web.OldWidget.extend({
         init: function(parent, options) {
             this._super(parent);
@@ -1113,10 +1233,19 @@ openerp.point_of_sale = function(db) {
             this.shop.bind('change:selectedOrder', this.changeSelectedOrder, this);
             this.bindPaymentLineEvents();
             this.bindOrderLineEvents();
+            this.calculatorCreated = 1;
+            //this.model.set("calculatorCreated",1)
         },
         paymentLineList: function() {
             return this.$element.find('#paymentlines');
         },
+        calculatorLineList: function() {
+            return this.$element.find('#calculatorlines');
+        },
+        iscalculatorCreated: function() {
+            return this.calculatorCreated
+        },
+
         start: function() {
             $('button#validate-order', this.$element).click(_.bind(this.validateCurrentOrder, this));
             //$('button#validate-order', this.$element).click(_.bind(this.prueba, this));
@@ -1136,8 +1265,8 @@ openerp.point_of_sale = function(db) {
             if (parseFloat($("#payment-remaining").html())>=0 || tipoComprobante == 'devolucion'){
               paidTotal = currentOrder.getPaidTotal();
               ledDisplay("Vuelto:",$("#payment-remaining").html());
-              impresora_fiscal("SUBTOTAL","SUBTOTAL");
               impresora_fiscal("GAVETA","GAVETA");
+              impresora_fiscal("SUBTOTAL","SUBTOTAL");
               impresora_fiscal("PAGO","Pago Recibido___"+paidTotal*100);
               impresora_fiscal("ESCRIBIR","Referencia: "+currentOrder.get('name'));
               impresora_fiscal("CERRAR1","CERRAR1");
@@ -1152,6 +1281,7 @@ openerp.point_of_sale = function(db) {
             }
         },
         bindPaymentLineEvents: function() {
+            this.currentPaymentLines = (this.shop.get('selectedOrder')).get('paymentLines');
             this.currentPaymentLines = (this.shop.get('selectedOrder')).get('paymentLines');
             this.currentPaymentLines.bind('add', this.addPaymentLine, this);
             this.currentPaymentLines.bind('remove', this.render_element, this);
@@ -1168,6 +1298,22 @@ openerp.point_of_sale = function(db) {
             this.bindOrderLineEvents();
             this.render_element();
         },
+        addCalculatorLine: function(ncl) {
+            var x = new CalculatorlineWidget(null, {
+                    model: ncl,
+                    order: this.shop.get('selectedOrder'),
+                    numpadState: this.numpadState 
+                });
+            //x.render_element()
+            x.appendTo(this.calculatorLineList());
+       //     x.appendTo(this.paymentLineList());
+
+            // Load Ticket Cesta calculator
+      //    $('div#ticket_body').attr('style','display:none');
+      //      $('div#ticket-calc').attr('style','display:block;visibility:visible');
+	  
+        },
+
         addPaymentLine: function(newPaymentLine) {
             var x = new PaymentlineWidget(null, {
                     model: newPaymentLine,
@@ -1198,9 +1344,26 @@ openerp.point_of_sale = function(db) {
                 this.addPaymentLine(paymentLine);
             }, this));
             this.updatePaymentSummary();
+
+
+
+            this.calculatorLineList().empty();
+            if(this.iscalculatorCreated()){
+
+                    var calculator = new Calculatorline()
+                    calculator.setName("Cantidad")
+                    this.addCalculatorLine(calculator);
+                    alert("creando calculadora")
+
+                    var calculator = new Calculatorline()
+                    calculator.setName("Valor")
+                    this.addCalculatorLine(calculator);
+
+                    this.calculatorCreated = 0
+            }
         },
         deleteLine: function(lineWidget) {
-           this.currentPaymentLines.remove([lineWidget.model]);
+            this.currentPaymentLines.remove([lineWidget.model]);
         },
         updatePaymentSummary: function() {
             var currentOrder, dueTotal, paidTotal, remaining, remainingAmount;
